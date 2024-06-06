@@ -1,6 +1,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'polls/style.css' %}">
-
+<p><a href="{% url 'home' %}">Home</a></p>
+<p><a href="{% url 'polls:index' %}">Back?</a></p>
 <h1>{{ question.question_text }}</h1>
 
 <ul>
