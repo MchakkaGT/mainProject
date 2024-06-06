@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            var mapOptions = {
+                center: new google.maps.LatLng(37.7749, -122.4194), // this is SF
+                zoom: 8
+            };
+            var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        }
+    </script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Google Map</h1>
+    <div id="map"></div>
+</body>
+</html>
