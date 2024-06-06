@@ -1,5 +1,7 @@
 <form action="{% url 'polls:vote' question.id %}" method="post">
 {% csrf_token %}
+<p><a href="{% url 'home' %}">Home</a></p>
+<p><a href="{% url 'polls:index' %}">Back?</a></p>
 <fieldset>
     <legend><h1>{{ question.question_text }}</h1></legend>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
