@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static '../static/polls/restaurantSearch.css' %}">
+</head>
+<body>
+
+    {#  NavBar   #}
+    <div style="width: 100%;">
+        {% include 'polls/components/navbar.html' %}
+    </div>
+
+    {#  Search Bar  #}
+    <div class="search-container">
+        <input class="search-bar" placeholder="Search for restaurants">
+        <button><i class="fas fa-search"></i></button>
+    </div>
+    
+    {#  Restaurant Cards  #}
+    <div class="card-grid">
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+        
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+        
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+        
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+        
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+        
+        <div class="info-card">
+            {% include 'polls/components/infoCard.html' %}
+        </div>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NavBar</title>
+    <link rel="stylesheet" href="{% static 'polls/stylesheets/../../../static/polls/navbar.css' %}">
+    
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/polls" class="navbar-logo">
+                Taste of Atlanta
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/polls" class="nav-links">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/polls/restaurants_search" class="nav-links">Restaurant Search</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/polls/geolocation" class="nav-links">Geolocation</a>
+                </li>
+                <li>
+                    <a href="/polls/favorites" class="nav-links">Favorites</a>
+                </li>
+            </ul>
+            <div class="btn btn--outline">SIGN UP</div>
+        </div>
+    </nav>
+</body>
+</html>
