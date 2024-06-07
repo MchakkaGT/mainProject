@@ -1,4 +1,10 @@
 
+body {
+    margin: 0;
+    padding: 0;
+
+}
+
 .hero-container {
     background: white url("images/AtlantaPic2.jpeg") no-repeat center center;
     background-size: cover;

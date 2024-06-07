@@ -1,3 +1,9 @@
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
 .cards__item {
     border: 1px solid #e0e0e0;
     border-radius: 8px;

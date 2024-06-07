@@ -1,13 +1,18 @@
-{% extends "../base.html" %}
+{% extends "registration/base.html" %}
 
-{% block title %}Login{% endblock %}
+<body>
+    {% block title %}Login{% endblock %}
 
-{% block content %}
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form }}
-  <button type="submit">Log In</button>
-<p><a href="{% url 'home' %}">Home</a></p>
-</form>
-{% endblock %}
+    {% block content %}
+        <div class="container">
+            <h2 class="title">Log In</h2>
+            <form class="inputs" method="post">
+                {% csrf_token %}
+                {{ form }}
+            <button class="click_button" type="submit">Log In</button>
+            <p class="exit_link"><a href="{% url 'signup' %}">Sign Up</a></p>
+            </form>
+        </div>
+
+    {% endblock %}
+</body>
