@@ -1,4 +1,4 @@
-{% load static %}
+fit{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,34 +19,56 @@
         <input class="search-bar" placeholder="Search for restaurants">
         <button><i class="fas fa-search"></i></button>
     </div>
-    
+
     {#  Restaurant Cards  #}
-    <div class="card-grid">
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-        
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-        
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-        
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-        
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-        
-        <div class="info-card">
-            {% include 'polls/components/infoCard.html' %}
-        </div>
-    </div>
+{#    <div class="card-grid">#}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#        #}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#        #}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#        #}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#        #}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#        #}
+{#        <div class="info-card">#}
+{#            {% include 'polls/components/infoCard.html' %}#}
+{#        </div>#}
+{#    </div>#}
 
 
+<!-- restaurant_search/templates/search.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Search</title>
+</head>
+<body>
+    <h1>Search for a Restaurant</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+
+    {% if details %}
+    <h2>Restaurant Details</h2>
+    <p>Name: {{ details.name }}</p>
+    <p>Address: {{ details.formatted_address }}</p>
+    <p>Phone: {{ details.formatted_phone_number }}</p>
+    <p>Website: <a href="{{ details.website }}" target="_blank">{{ details.website }}</a></p>
+    <p>Rating: {{ details.rating }}</p>
+    {% endif %}
 </body>
 </html>
