@@ -40,7 +40,7 @@
     {% for detail in details %}
         <p>Name: {{ detail.name }}</p>
         <p>Address: {{ detail.formatted_address }}</p>
-        <p>Phone: {{ detail.formatted_phone_number }}</p>
+        <p>Phone: {{ detail.opening_hours}}</p>
         <p>Website: 
             {% if detail.website %}
                 <a href="{{ detail.website }}" target="_blank">{{ detail.website }}</a>

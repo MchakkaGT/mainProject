@@ -1,3 +1,5 @@
+import time
+
 import requests
 from django.shortcuts import render
 from .forms import RestaurantSearchForm
@@ -15,7 +17,7 @@ def restaurant_search(request):
         if form.is_valid():
             query = form.cleaned_data['query']
             details = get_restaurant_details(query)
-            print(details)
+
     else:
         form = RestaurantSearchForm()
 
@@ -24,25 +26,39 @@ def restaurant_search(request):
 
 def get_restaurant_details(query):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
-    url = f'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={query}&inputtype=textquery&fields=name,formatted_address,rating,place_id&key={api_key}'
-    response = requests.get(url)
+    base_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
+
+    params = {
+        'query': query,
+        'key': api_key
+    }
+
+    response = requests.get(base_url, params=params)
     result = response.json()
 
     restaurants = []
 
-    if result['status'] == 'OK' and result['candidates']:
-        for candidate in result['candidates'][:10]:
-            place_id = candidate['place_id']
+    if result.get('status') == 'OK' and 'results' in result:
+        candidates = result.get('results', [])[:10]
+        print(candidates)
 
-            detail_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,formatted_address,formatted_phone_number,geometry,website,rating,types&key={api_key}'
-            detail_response = requests.get(detail_url)
-            place_details = detail_response.json().get('result', {})
+        for candidate in candidates:
+            place_id = candidate.get('place_id')
+            if place_id:
+                detail_url = 'https://maps.googleapis.com/maps/api/place/details/json'
+                detail_params = {
+                    'place_id': place_id,
+                    'fields': 'name,formatted_address,rating,opening_hours,types,',
+                    'key': api_key
+                }
+                detail_response = requests.get(detail_url, params=detail_params)
+                place_details = detail_response.json().get('result', {})
+                print(place_details)
 
-            if 'restaurant' in place_details.get('types', []):
-                restaurants.append(place_details)
+                if 'restaurant' in place_details.get('types', []):
+                    restaurants.append(place_details)
 
-        return restaurants
-    return None
+    return restaurants
 
 def geolocation(request):
     # Your logic for the Geolocation view
