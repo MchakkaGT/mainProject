@@ -15,6 +15,7 @@ def restaurant_search(request):
         if form.is_valid():
             query = form.cleaned_data['query']
             details = get_restaurant_details(query)
+            print(details)
     else:
         form = RestaurantSearchForm()
 
@@ -27,13 +28,21 @@ def get_restaurant_details(query):
     response = requests.get(url)
     result = response.json()
 
-    if result['status'] == 'OK' and result['candidates']:
-        place_id = result['candidates'][0]['place_id']
-        detail_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,formatted_address,formatted_phone_number,geometry,website,rating&key={api_key}'
-        detail_response = requests.get(detail_url)
-        return detail_response.json().get('result', {})
-    return None
+    restaurants = []
 
+    if result['status'] == 'OK' and result['candidates']:
+        for candidate in result['candidates'][:10]:
+            place_id = candidate['place_id']
+
+            detail_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,formatted_address,formatted_phone_number,geometry,website,rating,types&key={api_key}'
+            detail_response = requests.get(detail_url)
+            place_details = detail_response.json().get('result', {})
+
+            if 'restaurant' in place_details.get('types', []):
+                restaurants.append(place_details)
+
+        return restaurants
+    return None
 
 def geolocation(request):
     # Your logic for the Geolocation view

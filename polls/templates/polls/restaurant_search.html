@@ -26,21 +26,40 @@
 
     {#  Restaurant Cards  #}
     <div class="card-grid">
+        {% if details %}
         <div class="info-card">
             {% include 'polls/components/infoCard.html' with name=details.name address=details.formatted_address rating=details.rating %}
         </div>
+        {% endif %}
     </div>
 
 
 <!-- restaurant_search/templates/search.html -->
-<h2>Restaurant Details</h2>
     {% if details %}
-    <h2>Restaurant Details</h2>
-    <p>Name: {{ details.name }}</p>
-    <p>Address: {{ details.formatted_address }}</p>
-    <p>Phone: {{ details.formatted_phone_number }}</p>
-    <p>Website: <a href="{{ details.website }}" target="_blank">{{ details.website }}</a></p>
-    <p>Rating: {{ details.rating }}</p>
-    {% endif %}
+    <h2>Restaurant Details (Total: {{ details|length }})</h2>
+    {% for detail in details %}
+        <p>Name: {{ detail.name }}</p>
+        <p>Address: {{ detail.formatted_address }}</p>
+        <p>Phone: {{ detail.formatted_phone_number }}</p>
+        <p>Website: 
+            {% if detail.website %}
+                <a href="{{ detail.website }}" target="_blank">{{ detail.website }}</a>
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p>Rating: 
+            {% if detail.rating %}
+                {{ detail.rating }}
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p>.................................................</p>
+    {% endfor %}
+{% else %}
+    <p>No restaurant details found.</p>
+{% endif %}
+
 </body>
 </html>
