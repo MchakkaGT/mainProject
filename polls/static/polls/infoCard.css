@@ -16,8 +16,13 @@ body {
 
 .restaurant-img {
     height: 200px;
-    background: url("images/Argosy.jpeg") no-repeat center center;
-    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: auto auto;
+}
+
+.restaurant-img.no-image {
+    background-color: #ccc;
 }
 
 .info {
