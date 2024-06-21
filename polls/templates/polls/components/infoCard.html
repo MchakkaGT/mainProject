@@ -12,9 +12,9 @@
         <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
         <div class="info">
             <p class="restaurant-name">{{ detail.name }}</p>
-            <p class="restaurant-address">{{ detail.formatted_address }}</p>
-            <p class="timings"><strong>Closing Time:</strong> 5pm - 1am</p>
-            <p class="description">Hip New American pub with beers galore</p>
+            <p class="restaurant-address">{{ detail.address }}</p>
+            <p class="timings"><strong>Closing Times:</strong> {{ detail.open_hours }}</p>
+            <p class="phone_number"><strong>Phone Number: </strong> {{ detail.number }}</p>
         </div>
         <div class="rating">
             <div class="stars">

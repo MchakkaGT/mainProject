@@ -1,12 +1,12 @@
-import time
 
 import requests
 from django.shortcuts import render
 from .forms import RestaurantSearchForm
+from datetime import datetime
+
 
 # View function to call on the home page
 def home(request):
-    # Your logic for the Home view
     return render(request, 'polls/home.html')
 
 
@@ -26,7 +26,7 @@ def restaurant_search(request):
     return render(request, 'polls/restaurant_search.html', {'form': form, 'details': details})
 
 
-# This function is mainly utilized to connect with the Google API and pull information about resturants.
+# Function to retrieve restaurants sorted by distance
 def get_restaurant_details(query):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
     base_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
@@ -36,64 +36,84 @@ def get_restaurant_details(query):
         'key': api_key
     }
 
-    # Pulls any information related to the query and converts it into a readable form.
     response = requests.get(base_url, params=params)
     result = response.json()
 
     restaurants = []
 
-    # Used to iterate through the json file and put restaurants into an array which can be returned
-    # back to the restaurant_search page
     if result.get('status') == 'OK' and 'results' in result:
-        candidates = result.get('results', [])[:9]
+        candidates = result.get('results', [])[:9]  # Retrieve up to 9 results
 
-        # Takes in the first 10 candidates and iterates through them to make sure they are
-        # restaurants and puts them into an array with the details requested for through
-        # parameters.
         for candidate in candidates:
-            place_id = candidate.get('place_id')
-            if place_id:
-                detail_url = 'https://maps.googleapis.com/maps/api/place/details/json'
-                detail_params = {
-                    'place_id': place_id,
-                    'fields': 'name,types,formatted_address,rating,photos',
-                    'key': api_key
+            if 'restaurant' in candidate.get('types', []):
+
+                # Get restaurant details
+                candidate_details = {
+                    'name': candidate.get('name'),
+                    'address': candidate.get('formatted_address'),
+                    'rating': candidate.get('rating'), 'today_hours': None,
+                    'image_url': get_image(candidate, api_key),
+                    'open_hours': None,
+                    'number': None
                 }
-                detail_response = requests.get(detail_url, params=detail_params)
-                place_details = detail_response.json().get('result', {})
 
-                if 'restaurant' in place_details.get('types', []):
+                # Get specific details
+                details = get_details(candidate, api_key, candidate.get('place_id'))
+                candidate_details['open_hours'] = details.get('open_hours')
+                candidate_details['number'] = details.get('number')
 
-                    # Gets photos if available
-                    photos = place_details.get('photos', [])
-                    if photos:
-                        photo_ref = photos[0]['photo_reference']
-                        image_url = get_image_url(photo_ref, api_key)
-                        place_details['image_url'] = image_url
+                restaurants.append(candidate_details)
 
-                    restaurants.append(place_details)
+    return restaurants if restaurants else None
 
-    if len(restaurants) == 0:
-        return None
+
+def get_image(candidate, api_key):
+    photo_base_url = 'https://maps.googleapis.com/maps/api/place/photo'
+
+    if 'photos' in candidate and len(candidate['photos']) > 0:
+        photo_reference = candidate['photos'][0]['photo_reference']
+        photo_url = f'{photo_base_url}?maxwidth=400&photoreference={photo_reference}&key={api_key}'
+        return photo_url
     else:
-        return restaurants
+        return None
 
 
-def get_image_url(photo_reference, api_key):
-    photos_url = 'https://maps.googleapis.com/maps/api/place/photo'
-    photos_params = {
-        'photoreference': photo_reference,
-        'maxwidth': 400,
-        'key': api_key
-    }
-    response = requests.get(photos_url, params=photos_params)
-    return response.url
+def get_details(candidate, api_key, place_id):
+    place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json'
+
+    if place_id:
+        details_params = {
+            'place_id': place_id,
+            'key': api_key,
+            'fields': 'opening_hours,formatted_phone_number'
+        }
+        details_response = requests.get(place_details_url, params=details_params)
+        details_result = details_response.json()
+
+        if details_result.get('status') == 'OK' and 'result' in details_result:
+            detailed_info = details_result['result']
+            opening_hours = detailed_info.get('opening_hours', {})
+
+            place_details = {
+                'open_hours': None,
+                'number': detailed_info.get('formatted_phone_number')
+            }
+
+            if opening_hours:
+                weekday_text = opening_hours.get('weekday_text', [])
+
+                if weekday_text:
+                    current_day_index = datetime.now().weekday()
+                    today_hours = weekday_text[current_day_index]
+                    timings_only = today_hours.split(': ', 1)[1].strip()
+                    place_details['open_hours'] = timings_only
+
+        return place_details
+
 
 def geolocation(request):
-    # Your logic for the Geolocation view
     return render(request, 'polls/geolocation.html')
 
 
 def favorites(request):
-    # Your logic for the Favorites view
     return render(request, 'polls/favorites.html')
