@@ -12,40 +12,60 @@ def home(request):
 
 # View function that is used to call on the restaurant_search page
 def restaurant_search(request):
-    details = None
-
-    # If searchbar returns a query (user input) then we use this if statement
     if request.method == 'POST':
-        form = RestaurantSearchForm(request.POST)
-        if form.is_valid():
-            query = form.cleaned_data['query']
-            details = get_restaurant_details(query)
-    else:
-        form = RestaurantSearchForm()
+        query = request.POST.get('query', '')
+        rating = request.POST.get('rating')
+        max_price = request.POST.get('max_price')
+        distance = request.POST.get('distance')
 
-    return render(request, 'polls/restaurant_search.html', {'form': form, 'details': details})
+        # Convert distance to meters if specified
+        if distance:
+            distance = int(distance) * 1000
+
+        details = get_restaurant_details(query, rating, max_price, distance)
+        return render(request, 'polls/restaurant_search.html', {'details': details})
+    return render(request, 'polls/restaurant_search.html', {})
 
 
 # Function to retrieve restaurants sorted by distance
-def get_restaurant_details(query):
+def get_restaurant_details(query, rating=None, max_price=None, distance=None):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
-    base_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
+    base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
     params = {
-        'query': query,
-        'key': api_key
+        'keyword': query,
+        'key': api_key,
+        'type': 'restaurant',
+        'location': '34.19656985679236, -84.22358663254866',
+        'radius': distance or 5000
     }
 
     response = requests.get(base_url, params=params)
     result = response.json()
 
     restaurants = []
+    size = 0
 
     if result.get('status') == 'OK' and 'results' in result:
-        candidates = result.get('results', [])[:9]  # Retrieve up to 9 results
+        candidates = result.get('results', [])[:]
 
         for candidate in candidates:
-            if 'restaurant' in candidate.get('types', []):
+            is_restaurant = 'restaurant' in candidate.get('types', [])
+
+            if candidate.get('price_level') and max_price:
+                is_max = float(candidate.get('price_level')) <= float(max_price)
+            else:
+                is_max = True
+
+            if candidate.get('rating') and rating:
+                candidate_rating = float(candidate.get('rating'))
+                rating_value = float(rating)
+                is_rating = candidate_rating >= rating_value
+            else:
+                is_rating = True
+
+            if is_restaurant and size < 9 and is_rating and is_max:
+                print(candidate)
 
                 # Get restaurant details
                 candidate_details = {
@@ -54,15 +74,17 @@ def get_restaurant_details(query):
                     'rating': candidate.get('rating'), 'today_hours': None,
                     'image_url': get_image(candidate, api_key),
                     'open_hours': None,
-                    'number': None
+                    'number': None,
                 }
 
                 # Get specific details
                 details = get_details(candidate, api_key, candidate.get('place_id'))
                 candidate_details['open_hours'] = details.get('open_hours')
                 candidate_details['number'] = details.get('number')
+                candidate_details['address'] = details.get('address')
 
                 restaurants.append(candidate_details)
+                size += 1
 
     return restaurants if restaurants else None
 
@@ -85,8 +107,9 @@ def get_details(candidate, api_key, place_id):
         details_params = {
             'place_id': place_id,
             'key': api_key,
-            'fields': 'opening_hours,formatted_phone_number'
+            'fields': 'opening_hours,formatted_phone_number,formatted_address'
         }
+
         details_response = requests.get(place_details_url, params=details_params)
         details_result = details_response.json()
 
@@ -96,7 +119,8 @@ def get_details(candidate, api_key, place_id):
 
             place_details = {
                 'open_hours': None,
-                'number': detailed_info.get('formatted_phone_number')
+                'number': detailed_info.get('formatted_phone_number'),
+                'address': detailed_info.get('formatted_address'),
             }
 
             if opening_hours:
