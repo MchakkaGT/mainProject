@@ -28,5 +28,6 @@ urlpatterns = [
     path('map/', include('map.urls'))
 ]
 
+
 def map_view(request):
     return render(request, 'map/map.html')

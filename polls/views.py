@@ -1,7 +1,7 @@
 
 import requests
+import json
 from django.shortcuts import render
-from .forms import RestaurantSearchForm
 from datetime import datetime
 
 
@@ -23,7 +23,10 @@ def restaurant_search(request):
             distance = int(distance) * 1000
 
         details = get_restaurant_details(query, rating, max_price, distance)
-        return render(request, 'polls/restaurant_search.html', {'details': details})
+        details_json = json.dumps(details)
+
+
+        return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
     return render(request, 'polls/restaurant_search.html', {})
 
 
@@ -65,17 +68,20 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
                 is_rating = True
 
             if is_restaurant and size < 9 and is_rating and is_max:
-                print(candidate)
 
                 # Get restaurant details
                 candidate_details = {
                     'name': candidate.get('name'),
                     'address': candidate.get('formatted_address'),
-                    'rating': candidate.get('rating'), 'today_hours': None,
+                    'rating': candidate.get('rating'),
+                    'today_hours': None,
                     'image_url': get_image(candidate, api_key),
                     'open_hours': None,
                     'number': None,
+                    'lat': candidate['geometry']['location']['lat'],
+                    'lng': candidate['geometry']['location']['lng']
                 }
+
 
                 # Get specific details
                 details = get_details(candidate, api_key, candidate.get('place_id'))
