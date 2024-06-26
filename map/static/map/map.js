@@ -14,11 +14,6 @@
 
         pos = getUserPos();
 
-        const marker = new AdvancedMarkerElement({
-              map,
-              position: {lat: 33.78409747041849, lng:-84.38368544087808},
-          });
-
         const locationButton = document.createElement("button");
 
         locationButton.textContent = "Pan to Current Location";
@@ -36,19 +31,19 @@
       const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
         "places",
       );
-      const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+      const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
       // Restrict within the map viewport.
-      let center= {lat: 33.78409747041849, lng:-84.38368544087808};
+      let center = map.center;
       const request = {
         // required parameters
-        fields: ["displayName", "location", "businessStatus"],
+        fields: ["displayName", "location", "businessStatus", ],
         locationRestriction: {
           center: center,
-          radius: 500,
+          radius: 1000,
         },
         // optional parameters
         includedPrimaryTypes: ["restaurant"],
-        maxResultCount: 5,
+        maxResultCount: 10,
         rankPreference: SearchNearbyRankPreference.POPULARITY,
         language: "en-US",
         region: "us",
@@ -56,6 +51,7 @@
       //@ts-ignore
       const { places } = await Place.searchNearby(request);
 
+      infoWindow2 = new google.maps.InfoWindow();
       if (places.length) {
         console.log(places);
 
@@ -64,11 +60,25 @@
 
         // Loop through and get all the results.
         places.forEach((place) => {
-          const markerView = new AdvancedMarkerElement({
+            const pin = new PinElement({
+            scale: 1,
+        });
+
+          const marker = new AdvancedMarkerElement({
             map,
             position: place.location,
             title: place.displayName,
+
+              content: pin.element,
+              gmpClickable: true,
           });
+
+        marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
+            infoWindow2.close();
+            infoWindow2.setContent(marker.title);
+            infoWindow2.open(marker.map, marker);
+        });
 
           bounds.extend(place.location);
           console.log(place);
