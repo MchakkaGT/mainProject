@@ -7,31 +7,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'polls/restaurantSearch.css' %}">
     <style>
-        .main-content {
-            display: flex;
-            height: 100vh; /* Set height to viewport height */
-        }
-        
-        .restaurant-list {
-            width: 30%;
-            overflow-y: auto; /* Enable vertical scrolling */
-            height: 100%; /* Full height of the parent container */
-        }
-        
-        .map-container {
-            width: 50%;
-            height: 100vh;
-            padding-left: 10px;
-        }
-        
-        .info-card {
-            margin-bottom: 20px;
-        }
-        
-        .search-container {
-            margin: 20px 0;
-        }
-        
+        {#.main-content {#}
+        {#    display: flex;#}
+        {#    height: 100vh; /* Set height to viewport height */#}
+
+        {##}
+        {#.restaurant-list {#}
+        {#    width: 30%;#}
+        {#    overflow-y: auto; /* Enable vertical scrolling */#}
+        {#    height: 100%; /* Full height of the parent container */#}
+
+        {##}
+        {#.map-container {#}
+        {#    width: 50%;#}
+        {#    height: 100vh;#}
+        {#    padding-left: 10px;#}
+
+        {##}
+        {#.info-card {#}
+        {#    margin-bottom: 20px;#}
+
         #map {
             width: 138.5%;
             height: 100%;
@@ -60,9 +55,9 @@
             
             <div class="filters-container">
                 <div class="filter">
-                    <label for="rating">Minimum Rating:</label>
+                    <label for="rating"></label>
                     <select id="rating" name="rating">
-                        <option value="" selected>Any</option>
+                        <option value="" selected>Minimum Rating</option>
                         <option value="1">1+</option>
                         <option value="2">2+</option>
                         <option value="3">3+</option>
@@ -71,9 +66,9 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="max_price">Max Price Level:</label>
+                    <label for="max_price"></label>
                     <select id="max_price" name="max_price">
-                        <option value="" selected>Any</option>
+                        <option value="" selected>Max Price Level</option>
                         <option value="0">Free</option>
                         <option value="1">Inexpensive</option>
                         <option value="2">Moderate</option>
@@ -82,8 +77,8 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="distance">Max Distance (km):</label>
-                    <input type="number" id="distance" name="distance" placeholder="e.g., 5">
+                    <label for="distance"></label>
+                    <input type="number" id="distance" name="distance" placeholder="Max Distance (km): e.g. 5">
                 </div>
             </div>
             

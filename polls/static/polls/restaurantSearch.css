@@ -14,30 +14,37 @@ body {
     align-items: center;
 }
 
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
 .search-bar {
     width: 50vw;
-    padding: 15px 15px;
     border-radius: 20px;
     border: 2px solid gray;
     font-size: 16px;
+    padding: 15px 50px 15px 15px;
 }
 
-.search-container button {
-    position: absolute;
-    right: 24.2%;
-    top: 26%;
-    padding: 0 10px;
-    font-size: 17px;
+.search-bar-container button {
+    width: 40px;
+    height: 40px;
     background-color: #4CAF50;
-    border: 1px solid #4CAF50;
+    border: none;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
     cursor: pointer;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
+    font-size: 17px;
 }
+
 
 .info-card {
     padding-top: 30px;
@@ -51,4 +58,37 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-right: 19px;
+}
+
+.filter {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.filter label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filter select,
+.filter input {
+    width: 99%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px gray;
+}
+
 
