@@ -39,7 +39,7 @@
         fields: ["displayName", "location", "businessStatus", ],
         locationRestriction: {
           center: center,
-          radius: 1000,
+          radius: 100000,
         },
         // optional parameters
         includedPrimaryTypes: ["restaurant"],

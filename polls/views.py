@@ -3,6 +3,10 @@ import requests
 import json
 from django.shortcuts import render
 from datetime import datetime
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
+from polls.models import Favorite
 
 
 # View function to call on the home page
@@ -24,7 +28,6 @@ def restaurant_search(request):
 
         details = get_restaurant_details(query, rating, max_price, distance)
         details_json = json.dumps(details)
-
 
         return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
     return render(request, 'polls/restaurant_search.html', {})
@@ -145,5 +148,49 @@ def geolocation(request):
     return render(request, 'polls/geolocation.html')
 
 
+def add_to_favorites(request):
+    try:
+        if request.method == 'GET':
+            user = request.user
+            name = request.GET.get('name')
+            address = request.GET.get('address')
+            open_hours = request.GET.get('open_hours')
+            number = request.GET.get('number')
+            rating = request.GET.get('rating')
+            latitude = float(request.GET.get('latitude', 0))  # Convert to float
+            longitude = float(request.GET.get('longitude', 0))  # Convert to float
+            image_url = request.GET.get('image_url')
+
+            print(name)
+
+            # Check if restaurant already exists in favorites for the current user
+            if not Favorite.objects.filter(user=user, name=name, address=address).exists():
+                favorite = Favorite(
+                    user=request.user,
+                    name=name,
+                    address=address,
+                    open_hours=open_hours,
+                    number=number,
+                    rating=rating,
+                    latitude=latitude,
+                    longitude=longitude,
+                    image_url=image_url
+                )
+                favorite.save()
+
+                # Confirm save operation
+                print(f"Saved favorite: {favorite}")
+                return JsonResponse({'status': 'success', 'message': 'Favorite added successfully.'})
+            else:
+                return JsonResponse({'status': 'info', 'message': 'Restaurant is already in favorites.'})
+
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+    except Exception as e:
+        print(f"Error in add_to_favorites view: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Internal Server Error.'}, status=500)
+
+
 def favorites(request):
-    return render(request, 'polls/favorites.html')
+    favorite_restaurants = Favorite.objects.all()
+    return render(request, 'polls/favorites.html', {'favorites': favorite_restaurants})

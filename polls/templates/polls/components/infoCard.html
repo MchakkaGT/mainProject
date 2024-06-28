@@ -4,18 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>InfoCard</title>
-    <link rel="stylesheet" href="{% static '../static/polls/infoCard.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/infoCard.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
 </head>
 <body>
 
     <div class="cards__item">
         <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
+
+    <button class="fav-button" onclick="buttonClicked()"> Add to Favorites </button>
+
         <div class="info">
             <p class="restaurant-name">{{ detail.name }}</p>
             <p class="restaurant-address">{{ detail.address }}</p>
             <p class="timings"><strong>Closing Times:</strong> {{ detail.open_hours }}</p>
             <p class="phone_number"><strong>Phone Number: </strong> {{ detail.number }}</p>
         </div>
+
         <div class="rating">
             <div class="stars">
                 <span class="star"></span>
@@ -28,6 +34,27 @@
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
     </div>
+
+    <script>
+        function buttonClicked() {
+            const detail = {
+                name: "{{ detail.name }}",
+                address: "{{ detail.address }}",
+                open_hours: "{{ detail.open_hours }}",
+                number: "{{ detail.number }}",
+                rating: "{{ detail.rating }}",
+                image_url: "{{ detail.image_url }}"
+            };
+            
+            console.log(detail);
+    
+            $.ajax({
+                url: '/polls/add_to_favorites/',
+                type: 'GET',
+                data: detail
+            });
+        }
+    </script>
 
 </body>
 </html>

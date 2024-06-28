@@ -13,8 +13,12 @@
       <h1>ADVENTURE AWAITS</h1>
       <p>What are you waiting for?</p>
       <div class="hero-btns">
-        <a href="/accounts/signup/" class="btn">SIGN UP</a>
-        <a href="/accounts/login/" class="btn">LOGIN</a>
+        {% if user.is_authenticated %}
+                <p style="color: white">Welcome back, {{ user.username }}</p>
+            {% else %}
+                <a href="/accounts/signup/" class="btn">SIGN UP</a>
+                <a href="/accounts/login/" class="btn">LOGIN</a>
+            {% endif %}
       </div>
     </div>
 
