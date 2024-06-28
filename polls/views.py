@@ -1,6 +1,7 @@
 
 import requests
 import json
+import uuid
 from django.shortcuts import render
 from datetime import datetime
 
@@ -68,9 +69,10 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
                 is_rating = True
 
             if is_restaurant and size < 9 and is_rating and is_max:
-
+                unique_id = str(uuid.uuid4())
                 # Get restaurant details
                 candidate_details = {
+                    'id': unique_id,
                     'name': candidate.get('name'),
                     'address': candidate.get('formatted_address'),
                     'rating': candidate.get('rating'),

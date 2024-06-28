@@ -6,32 +6,7 @@
     <title>Restaurant Search</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'polls/restaurantSearch.css' %}">
-    <style>
-        {#.main-content {#}
-        {#    display: flex;#}
-        {#    height: 100vh; /* Set height to viewport height */#}
 
-        {##}
-        {#.restaurant-list {#}
-        {#    width: 30%;#}
-        {#    overflow-y: auto; /* Enable vertical scrolling */#}
-        {#    height: 100%; /* Full height of the parent container */#}
-
-        {##}
-        {#.map-container {#}
-        {#    width: 50%;#}
-        {#    height: 100vh;#}
-        {#    padding-left: 10px;#}
-
-        {##}
-        {#.info-card {#}
-        {#    margin-bottom: 20px;#}
-
-        #map {
-            width: 138.5%;
-            height: 100%;
-        }
-    </style>
 
 </head>
 <body>
@@ -55,9 +30,9 @@
             
             <div class="filters-container">
                 <div class="filter">
-                    <label for="rating"></label>
+                    <label for="rating">Minimum Rating:</label>
                     <select id="rating" name="rating">
-                        <option value="" selected>Minimum Rating</option>
+                        <option value="" selected>Any</option>
                         <option value="1">1+</option>
                         <option value="2">2+</option>
                         <option value="3">3+</option>
@@ -66,9 +41,9 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="max_price"></label>
+                    <label for="max_price">Max Price Level:</label>
                     <select id="max_price" name="max_price">
-                        <option value="" selected>Max Price Level</option>
+                        <option value="" selected>Any</option>
                         <option value="0">Free</option>
                         <option value="1">Inexpensive</option>
                         <option value="2">Moderate</option>
@@ -77,8 +52,8 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="distance"></label>
-                    <input type="number" id="distance" name="distance" placeholder="Max Distance (km): e.g. 5">
+                    <label for="distance">Max Distance (km):</label>
+                    <input type="number" id="distance" name="distance" placeholder="e.g., 5">
                 </div>
             </div>
             
@@ -87,22 +62,23 @@
 
     {#  Restaurant Cards  #}
     <div class="main-content">
-        <div class="card-grid restaurant-list">
+        <div class="restaurant-list">
             {% if details %}
                 {% for detail in details %}
-                    <div class="info-card">
-                        {% include 'polls/components/infoCard.html' with detail=detail%}
+                    <div class="info-card" data-id="{{ detail.id }}">
+                        {% include 'polls/components/infoCard.html' with detail=detail %}
                     </div>
                 {% endfor %}
             {% else %}
                 <p>Search for restaurants by typing their name, cuisine type, or street name.</p>
             {% endif %}
         </div>
-
+    
         <div class="map-container">
             <div id="map" style="height: 100vh; width: 100%;"></div>
         </div>
     </div>
+
 
 <script>
         let map;
@@ -140,9 +116,60 @@
 
                 marker.addListener('click', () => {
                     infoWindow.open(map, marker);
+                    showCustomInfoCard(restaurant);
                 });
             });
+            
+            function showCustomInfoCard(restaurant) {
+                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
+    
+                if (infoCard) {
+                    // Scroll to info card if it's not in view
+                    const cardRect = infoCard.getBoundingClientRect();
+                    const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+    
+                    if (!isCardVisible) {
+                        infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+    
+                    // Highlight the info card
+                    document.querySelectorAll('.info-card').forEach(card => {
+                        card.classList.remove('highlight');
+                    });
+                    infoCard.classList.add('highlight');
+                }
+            }
+        
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const restaurantId = card.getAttribute('data-id');
+                    const restaurant = restaurantData.find(r => r.id === restaurantId);
+                    if (restaurant) {
+                        map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
+                        highlightMarker(restaurantId);
+                    }
+                });
+            });
+            
+            function highlightInfoCard(restaurantId) {
+                document.querySelectorAll('.info-card').forEach(card => {
+                    if (card.getAttribute('data-id') === restaurantId) {
+                        card.classList.add('highlight');
+                    } else {
+                        card.classList.remove('highlight');
+                    }
+                });
+            }
 
+            function highlightMarker(restaurantId) {
+                markers.forEach(marker => {
+                    if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => marker.setAnimation(null), 1400);
+                    }
+                });
+            }
+        
             // Function to add user's current position marker
             function addUserMarker(userPos) {
                 if (userPos) {
