@@ -4,15 +4,22 @@
     {% block title %}Login{% endblock %}
 
     {% block content %}
+    {% if user.is_authenticated %}
+        Hi {{ user.username }}!
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+  <p><a href="{% url 'password_reset' %}">Reset Password</a></p>
+    {% else %}
         <div class="container">
             <h2 class="title">Log In</h2>
             <form class="inputs" method="post">
                 {% csrf_token %}
                 {{ form }}
             <button class="click_button" type="submit">Log In</button>
-            <p class="exit_link"><a href="{% url 'signup' %}">Sign Up</a></p>
+            <p class="exit_link"><a href="{% url 'signup' %}">Sign Up</a>
+                |
+                <a href="{% url 'password_reset' %}">Reset Password</a></p>
             </form>
         </div>
-
+    {% endif %}
     {% endblock %}
 </body>
