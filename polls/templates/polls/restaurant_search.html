@@ -81,21 +81,38 @@
 
 
 <script>
-        let map;
-        let infoWindow;
+        let map, infoWindow;
+        let pos = { lat: 34.1966224, lng: -84.2235670 };
 
         async function initMap() {
             const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 34.1966224, lng: -84.2235670 }, // Default center coordinates (can be any starting point)
+                center: pos, // Default center coordinates (can be any starting point)
                 zoom: 15,
+                mapId: "123891748939",
             });
+
+            pos = getUserPos();
+
+
+
+
+            const locationButton = document.createElement("button");
+            locationButton.textContent = "Pan to Current Location";
+            locationButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+            locationButton.addEventListener("click", () => {
+                getUserPos();
+            });
+
+            nearbySearch();
+
 
             const restaurantData = {{ mapDetails|safe }};
 
             const markers = [];
-
+            const infoWindow2 = new google.maps.InfoWindow();
             // Add markers for restaurants
             restaurantData.forEach(restaurant => {
                 const marker = new google.maps.Marker({
@@ -106,32 +123,36 @@
 
                 markers.push(marker);
 
-                const infoWindow = new google.maps.InfoWindow({
-                    content: `<div>
+
+                    let contentString = `<div>
                                 <h3>${restaurant.name}</h3>
                                 <p>${restaurant.address}</p>
+                                <p>${restaurant.number}</p>
                                 <p>Rating: ${restaurant.rating}</p>
                               </div>`
-                });
+
 
                 marker.addListener('click', () => {
-                    infoWindow.open(map, marker);
+                    infoWindow2.close();
+                    infoWindow2.setContent(contentString);
+                    infoWindow2.open(map, marker);
                     showCustomInfoCard(restaurant);
                 });
             });
-            
+
+
             function showCustomInfoCard(restaurant) {
                 const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
-    
+
                 if (infoCard) {
                     // Scroll to info card if it's not in view
                     const cardRect = infoCard.getBoundingClientRect();
                     const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
-    
+
                     if (!isCardVisible) {
                         infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
-    
+
                     // Highlight the info card
                     document.querySelectorAll('.info-card').forEach(card => {
                         card.classList.remove('highlight');
@@ -139,7 +160,7 @@
                     infoCard.classList.add('highlight');
                 }
             }
-        
+
             document.querySelectorAll('.info-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const restaurantId = card.getAttribute('data-id');
@@ -150,7 +171,7 @@
                     }
                 });
             });
-            
+
             function highlightInfoCard(restaurantId) {
                 document.querySelectorAll('.info-card').forEach(card => {
                     if (card.getAttribute('data-id') === restaurantId) {
@@ -169,7 +190,7 @@
                     }
                 });
             }
-        
+
             // Function to add user's current position marker
             function addUserMarker(userPos) {
                 if (userPos) {
@@ -185,16 +206,6 @@
                     markers.push(userMarker);
                 }
             }
-
-            getUserPos();
-
-            const locationButton = document.createElement("button");
-            locationButton.textContent = "Pan to Current Location";
-            locationButton.classList.add("custom-map-control-button");
-            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
-            locationButton.addEventListener("click", () => {
-                getUserPos();
-            });
 
             // Function to fit map to contain all markers
             function fitMapToBounds() {
@@ -229,7 +240,7 @@
                         
                         addUserMarker(userPos);
 
-                        fitMapToBounds();
+
                     },
                     () => {
                         handleLocationError(true, infoWindow, map.getCenter());
@@ -241,15 +252,79 @@
             return userPos;
         }
 
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(
-                browserHasGeolocation
-                    ? "Error: The Geolocation service failed."
-                    : "Error: Your browser doesn't support geolocation.",
-            );
-            infoWindow.open(map);
-        }
+        async function nearbySearch() {
+      //@ts-ignore
+      const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
+        "places",
+      );
+      const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+      // Restrict within the map viewport.
+      let center = map.center;
+      const request = {
+        // required parameters
+        fields: ["displayName", "location", "businessStatus", ],
+        locationRestriction: {
+          center: center,
+          radius: 1000,
+        },
+        // optional parameters
+        includedPrimaryTypes: ["restaurant"],
+        maxResultCount: 10,
+        rankPreference: SearchNearbyRankPreference.POPULARITY,
+        language: "en-US",
+        region: "us",
+      };
+      //@ts-ignore
+      const { places } = await Place.searchNearby(request);
+
+      infoWindow3 = new google.maps.InfoWindow();
+      if (places.length) {
+        console.log(places);
+
+        const { LatLngBounds } = await google.maps.importLibrary("core");
+        const bounds = new LatLngBounds();
+
+        // Loop through and get all the results.
+        places.forEach((place) => {
+            const pin = new PinElement({
+                background: '#FBBC04',
+                scale: 1,
+            });
+
+          const marker = new AdvancedMarkerElement({
+            map,
+            position: place.location,
+            title: place.displayName,
+
+              content: pin.element,
+              gmpClickable: true,
+          });
+
+        marker.addListener("click", ({ domEvent, latLng }) => {
+            const { target } = domEvent;
+            infoWindow3.close();
+            infoWindow3.setContent(marker.title);
+            infoWindow3.open(marker.map, marker);
+        });
+
+          bounds.extend(place.location);
+          console.log(place);
+        });
+        map.fitBounds(bounds);
+      } else {
+        console.log("No results");
+      }
+    }
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+            browserHasGeolocation
+                ? "Error: The Geolocation service failed."
+                : "Error: Your browser doesn't support geolocation.",
+        );
+        infoWindow.open(map);
+    }
 
         initMap();
     </script>
