@@ -4,7 +4,8 @@ import json
 from django.shortcuts import render
 from datetime import datetime
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 from polls.models import Favorite
 
@@ -74,6 +75,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
 
                 # Get restaurant details
                 candidate_details = {
+                    'place_id': candidate.get('place_id'),
                     'name': candidate.get('name'),
                     'address': candidate.get('formatted_address'),
                     'rating': candidate.get('rating'),
@@ -149,24 +151,25 @@ def geolocation(request):
 
 
 def add_to_favorites(request):
-    try:
-        if request.method == 'GET':
-            user = request.user
-            name = request.GET.get('name')
-            address = request.GET.get('address')
-            open_hours = request.GET.get('open_hours')
-            number = request.GET.get('number')
-            rating = request.GET.get('rating')
-            latitude = float(request.GET.get('latitude', 0))  # Convert to float
-            longitude = float(request.GET.get('longitude', 0))  # Convert to float
-            image_url = request.GET.get('image_url')
+    if request.method == 'POST':
+        user = request.user
+        data = request.POST
 
-            print(name)
+        try:
+            place_id = data.get('place_id')
+            name = data.get('name')
+            address = data.get('address')
+            open_hours = data.get('open_hours')
+            number = data.get('number')
+            rating = data.get('rating')
+            latitude = float(data.get('latitude', 0))
+            longitude = float(data.get('longitude', 0))
+            image_url = data.get('image_url')
 
-            # Check if restaurant already exists in favorites for the current user
-            if not Favorite.objects.filter(user=user, name=name, address=address).exists():
+            if not Favorite.objects.filter(user=user, place_id=place_id).exists():
                 favorite = Favorite(
-                    user=request.user,
+                    user=user,
+                    place_id=place_id,
                     name=name,
                     address=address,
                     open_hours=open_hours,
@@ -178,19 +181,56 @@ def add_to_favorites(request):
                 )
                 favorite.save()
 
-                # Confirm save operation
-                print(f"Saved favorite: {favorite}")
                 return JsonResponse({'status': 'success', 'message': 'Favorite added successfully.'})
             else:
                 return JsonResponse({'status': 'info', 'message': 'Restaurant is already in favorites.'})
 
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        except ValueError as e:
+            return JsonResponse({'status': 'error', 'message': 'Invalid data provided.'}, status=400)
 
-    except Exception as e:
-        print(f"Error in add_to_favorites view: {e}")
-        return JsonResponse({'status': 'error', 'message': 'Internal Server Error.'}, status=500)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error.'}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+def remove_from_favorites(request):
+    if request.method == 'POST':
+        place_id = request.POST.get('place_id')
+        try:
+            favorite = Favorite.objects.get(user=request.user, place_id=place_id)
+            favorite.delete()
+            return JsonResponse({'message': 'Successfully removed from favorites.'}, status=200)
+        except Favorite.DoesNotExist:
+            return JsonResponse({'error': 'Favorite does not exist.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+def get_favorite_place_ids(request):
+    favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
+    return JsonResponse(favorite_place_ids, safe=False)
 
 
 def favorites(request):
     favorite_restaurants = Favorite.objects.all()
-    return render(request, 'polls/favorites.html', {'favorites': favorite_restaurants})
+    favorites_dict = [
+        {
+            'name': favorite.name,
+            'place_id': favorite.place_id,
+            'address': favorite.address,
+            'rating': favorite.rating,
+            'open_hours': favorite.open_hours,
+            'number': favorite.number,
+            'latitude': favorite.latitude,
+            'longitude': favorite.longitude,
+            'image_url': favorite.image_url
+        }
+        for favorite in favorite_restaurants
+    ]
+
+    return render(request, 'polls/favorites.html', {'favorites': favorites_dict})
+
+
+

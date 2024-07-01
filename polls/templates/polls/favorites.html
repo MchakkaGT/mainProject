@@ -10,22 +10,18 @@
     <div style="width: 100%;">
         {% include 'polls/components/navbar.html' %}
     </div>
-
-    <ul>
-        {% for favorite in favorite_restaurants %}
-            <li>
-                <strong>Name:</strong> {{ favorite.name }}<br>
-                <strong>Address:</strong> {{ favorite.address }}<br>
-                <strong>Rating:</strong> {{ favorite.rating }}<br>
-                <strong>Opening Hours:</strong> {{ favorite.open_hours }}<br>
-                <strong>Phone Number:</strong> {{ favorite.number }}<br>
-                <strong>Latitude:</strong> {{ favorite.lat }}<br>
-                <strong>Longitude:</strong> {{ favorite.lng }}<br>
-            </li>
-        {% empty %}
-            <li>No favorites added yet.</li>
-        {% endfor %}
-    </ul>
+    
+    <div class="card-grid">
+        {% if favorites %}
+            {% for favorite in favorites %}
+                <div class="info-card">
+                    {% include 'polls/components/infoCard.html' with detail=favorite%}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No favorites added yet.</p>
+        {% endif %}
+    </div>
 
 </body>
 </html>
