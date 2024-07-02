@@ -4,6 +4,11 @@ import json
 import uuid
 from django.shortcuts import render
 from datetime import datetime
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+from polls.models import Favorite
 
 
 # View function to call on the home page
@@ -25,7 +30,6 @@ def restaurant_search(request):
 
         details = get_restaurant_details(query, rating, max_price, distance)
         details_json = json.dumps(details)
-
 
         return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
     return render(request, 'polls/restaurant_search.html', {})
@@ -69,10 +73,10 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
                 is_rating = True
 
             if is_restaurant and size < 9 and is_rating and is_max:
-                unique_id = str(uuid.uuid4())
+
                 # Get restaurant details
                 candidate_details = {
-                    'id': unique_id,
+                    'place_id': candidate.get('place_id'),
                     'name': candidate.get('name'),
                     'address': candidate.get('formatted_address'),
                     'rating': candidate.get('rating'),
@@ -147,5 +151,87 @@ def geolocation(request):
     return render(request, 'polls/geolocation.html')
 
 
+def add_to_favorites(request):
+    if request.method == 'POST':
+        user = request.user
+        data = request.POST
+
+        try:
+            place_id = data.get('place_id')
+            name = data.get('name')
+            address = data.get('address')
+            open_hours = data.get('open_hours')
+            number = data.get('number')
+            rating = data.get('rating')
+            latitude = float(data.get('latitude', 0))
+            longitude = float(data.get('longitude', 0))
+            image_url = data.get('image_url')
+
+            if not Favorite.objects.filter(user=user, place_id=place_id).exists():
+                favorite = Favorite(
+                    user=user,
+                    place_id=place_id,
+                    name=name,
+                    address=address,
+                    open_hours=open_hours,
+                    number=number,
+                    rating=rating,
+                    latitude=latitude,
+                    longitude=longitude,
+                    image_url=image_url
+                )
+                favorite.save()
+
+                return JsonResponse({'status': 'success', 'message': 'Favorite added successfully.'})
+            else:
+                return JsonResponse({'status': 'info', 'message': 'Restaurant is already in favorites.'})
+
+        except ValueError as e:
+            return JsonResponse({'status': 'error', 'message': 'Invalid data provided.'}, status=400)
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error.'}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+def remove_from_favorites(request):
+    if request.method == 'POST':
+        place_id = request.POST.get('place_id')
+        try:
+            favorite = Favorite.objects.get(user=request.user, place_id=place_id)
+            favorite.delete()
+            return JsonResponse({'message': 'Successfully removed from favorites.'}, status=200)
+        except Favorite.DoesNotExist:
+            return JsonResponse({'error': 'Favorite does not exist.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+def get_favorite_place_ids(request):
+    favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
+    return JsonResponse(favorite_place_ids, safe=False)
+
+
 def favorites(request):
-    return render(request, 'polls/favorites.html')
+    favorite_restaurants = Favorite.objects.all()
+    favorites_dict = [
+        {
+            'name': favorite.name,
+            'place_id': favorite.place_id,
+            'address': favorite.address,
+            'rating': favorite.rating,
+            'open_hours': favorite.open_hours,
+            'number': favorite.number,
+            'latitude': favorite.latitude,
+            'longitude': favorite.longitude,
+            'image_url': favorite.image_url
+        }
+        for favorite in favorite_restaurants
+    ]
+
+    return render(request, 'polls/favorites.html', {'favorites': favorites_dict})
+
+
+
