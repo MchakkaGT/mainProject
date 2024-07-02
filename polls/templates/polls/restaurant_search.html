@@ -107,36 +107,6 @@
                 getUserPos();
             });
             infoWindow = new google.maps.InfoWindow();
-
-            const restaurantData = {{ mapDetails|safe }};
-
-            const markers = [];
-            const infoWindow2 = new google.maps.InfoWindow();
-            // Add markers for restaurants
-            restaurantData.forEach(restaurant => {
-                const marker = new google.maps.Marker({
-                    position: { lat: restaurant.lat, lng: restaurant.lng },
-                    map: map,
-                    title: restaurant.name
-                });
-
-                markers.push(marker);
-
-
-                    let contentString = `<div>
-                                <h3>${restaurant.name}</h3>
-                                <p>${restaurant.address}</p>
-                                <p>${restaurant.number}</p>
-                                <p>Rating: ${restaurant.rating}</p>
-                              </div>`
-
-
-                marker.addListener('click', () => {
-                    infoWindow2.close();
-                    infoWindow2.setContent(contentString);
-                    infoWindow2.open(map, marker);
-                    showCustomInfoCard(restaurant);
-                });
             
 
             nearbySearch();
@@ -203,8 +173,8 @@
 
             // Fit map to show all markers
             fitMapToBounds();
-            });
         }
+        
 
         function getUserPos() {
             let userPos;
