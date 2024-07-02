@@ -4,3 +4,4 @@ django-debug-toolbar==4.3.0
 sqlparse==0.5.0
 googlemaps==4.10.0
 requests~=2.32.3
+djangorestframework~=3.15.2

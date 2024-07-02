@@ -4,30 +4,162 @@
 <head>
     <meta charset="UTF-8">
     <title>InfoCard</title>
-    <link rel="stylesheet" href="{% static '../static/polls/infoCard.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/infoCard.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
 </head>
 <body>
 
     <div class="cards__item">
         <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
+
+    <button class="fav-button" onclick="buttonClicked(this)"
+            data-place_id="{{ detail.place_id }}"
+            data-name="{{ detail.name }}"
+            data-address="{{ detail.address }}"
+            data-open_hours="{{ detail.open_hours }}"
+            data-number="{{ detail.number }}"
+            data-rating="{{ detail.rating }}"
+            data-image_url="{{ detail.image_url }}">
+        Add to Favorites
+    </button>
         <div class="info">
             <p class="restaurant-name">{{ detail.name }}</p>
             <p class="restaurant-address">{{ detail.address }}</p>
             <p class="timings"><strong>Closing Times:</strong> {{ detail.open_hours }}</p>
             <p class="phone_number"><strong>Phone Number: </strong> {{ detail.number }}</p>
         </div>
+
         <div class="rating">
             <div class="stars">
                 <span class="star"></span>
                 <span class="star"></span>
                 <span class="star"></span>
                 <span class="star"></span>
-                <span class="star"></span>
+                
             </div>
 
-            <div class="restaurant-rating">5.0</div>
+            <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
     </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        let favoritePlaceIds = [];
+
+        // Fetch favorite place IDs when the page loads
+        $(document).ready(function() {
+            fetchFavoritePlaceIds().then(() => {
+                updateButtonText();
+            });
+        });
+
+        // Function to fetch favorite place IDs
+        function fetchFavoritePlaceIds() {
+            return $.ajax({
+                url: '/polls/get_favorite_place_ids/',
+                type: 'GET',
+                success: function(response) {
+                    favoritePlaceIds = response;
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching favorite place IDs:', error);
+                }
+            });
+        }
+
+        // Function to update button text based on favorite status
+        function updateButtonText() {
+            const buttons = document.querySelectorAll('.fav-button');
+            buttons.forEach(button => {
+                const placeId = button.getAttribute('data-place_id');
+                if (favoritePlaceIds.includes(placeId)) {
+                    button.textContent = 'Remove from Favorites';
+                } else {
+                    button.textContent = 'Add to Favorites';
+                }
+            });
+        }
+
+        // Function to handle button click
+        function buttonClicked(button) {
+            const csrftoken = getCookie('csrftoken');
+            const placeId = button.getAttribute('data-place_id');
+            const isFavorite = favoritePlaceIds.includes(placeId);
+
+            if (isFavorite) {
+                removeFromFavorites(placeId, csrftoken).then(() => {
+                    button.textContent = 'Add to Favorites';
+                    favoritePlaceIds = favoritePlaceIds.filter(id => id !== placeId);
+                });
+            } else {
+                const detail = {
+                    place_id: button.getAttribute('data-place_id'),
+                    name: button.getAttribute('data-name'),
+                    address: button.getAttribute('data-address'),
+                    open_hours: button.getAttribute('data-open_hours'),
+                    number: button.getAttribute('data-number'),
+                    rating: button.getAttribute('data-rating'),
+                    image_url: button.getAttribute('data-image_url')
+                };
+                addToFavorites(detail, csrftoken).then(() => {
+                    button.textContent = 'Remove from Favorites';
+                    favoritePlaceIds.push(placeId);
+                });
+            }
+        }
+
+        // Function to remove from favorites
+        function removeFromFavorites(placeId, csrftoken) {
+            return $.ajax({
+                url: '/polls/remove_from_favorites/',
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    place_id: placeId
+                },
+                success: function(response) {
+                    console.log("Successfully removed from favorites.");
+                    window.location.reload();
+                    // Optionally, update button text or state here
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error removing from favorites:', error);
+                }
+            });
+        }
+
+        // Function to add to favorites
+        function addToFavorites(detail, csrftoken) {
+            return $.ajax({
+                url: '/polls/add_to_favorites/',
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                data: detail,
+                success: function(response) {
+                    console.log("Successfully added to favorites.");
+                    // Optionally, update button text or state here
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error adding to favorites:', error);
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>

@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <title>Restaurant Search</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static '../static/polls/restaurantSearch.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/restaurantSearch.css' %}">
+
+    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+        ({key: "AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0", v: "weekly"});</script>
+
+
 </head>
 <body>
 
@@ -14,29 +19,316 @@
         {% include 'polls/components/navbar.html' %}
     </div>
 
+
     {#  Search Bar  #}
     <div class="search-container">
         <form method="POST" action="{% url 'polls:restaurant_search' %}">
             {% csrf_token %}
-            <label for="query"></label>
-            <input class="search-bar" id="query" name="query" placeholder="Search for restaurants">
-            <button><i class="fas fa-search"></i></button>
+            <div class="search-bar-container">
+                <label for="query" hidden>Search for restaurants</label>
+                <input class="search-bar" id="query" name="query" placeholder="Search for restaurants">
+                
+                <button id="search-button" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+            
+            <div class="filters-container">
+                <div class="filter">
+                    <label for="rating">Minimum Rating:</label>
+                    <select id="rating" name="rating">
+                        <option value="" selected>Any</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="filter">
+                    <label for="max_price">Max Price Level:</label>
+                    <select id="max_price" name="max_price">
+                        <option value="" selected>Any</option>
+                        <option value="0">Free</option>
+                        <option value="1">Inexpensive</option>
+                        <option value="2">Moderate</option>
+                        <option value="3">Expensive</option>
+                        <option value="4">Very Expensive</option>
+                    </select>
+                </div>
+                <div class="filter">
+                    <label for="distance">Max Distance (km):</label>
+                    <input type="number" id="distance" name="distance" placeholder="e.g., 5">
+                </div>
+            </div>
+            
         </form>
-        
     </div>
 
     {#  Restaurant Cards  #}
-    <div class="card-grid">
-        {% if details %}
-            {% for detail in details %}
-                <div class="info-card">
-                    {% include 'polls/components/infoCard.html' with detail=detail%}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>Search for restaurants by typing their name, cuisine type, or street name.</p>
-        {% endif %}
+    <div class="main-content">
+        <div class="restaurant-list">
+            {% if details %}
+                {% for detail in details %}
+                    <div class="info-card" data-id="{{ detail.id }}">
+                        {% include 'polls/components/infoCard.html' with detail=detail %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Search for restaurants by typing their name, cuisine type, or street name.</p>
+            {% endif %}
+        </div>
+    
+        <div class="map-container">
+            <div id="map" style="height: 100vh; width: 100%;"></div>
+        </div>
     </div>
+
+
+<script>
+        let map, infoWindow;
+        let pos = { lat: 33.77683196783757, lng: -84.39622529694923 };
+
+        async function initMap() {
+            const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: pos, // Default center coordinates (can be any starting point)
+                zoom: 15,
+                mapId: "123891748939",
+            });
+
+            pos = getUserPos();
+
+
+            const locationButton = document.createElement("button");
+            locationButton.textContent = "Pan to Current Location";
+            locationButton.classList.add("custom-map-control-button");
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+            locationButton.addEventListener("click", () => {
+                getUserPos();
+            });
+            infoWindow = new google.maps.InfoWindow();
+
+            await nearbySearch();
+            await searchResults();
+
+        }
+        
+        async function searchResults() {
+            const restaurantData = {{ mapDetails|safe }};
+            if (!restaurantData || restaurantData.length === 0) {
+                console.log("no data");
+                return;
+            }
+            const markers = [];
+            // Add markers for restaurants
+            restaurantData.forEach(restaurant => {
+                const marker = new google.maps.Marker({
+                    position: {lat: restaurant.lat, lng: restaurant.lng},
+                    map: map,
+                    title: restaurant.name
+                });
+
+                markers.push(marker);
+
+
+                let contentString = `<div>
+                                <h3>${restaurant.name}</h3>
+                                <p>${restaurant.address}</p>
+                                <p>${restaurant.number}</p>
+                                <p>Rating: ${restaurant.rating}</p>
+                              </div>`
+
+
+                marker.addListener('click', () => {
+                    infoWindow.close();
+                    infoWindow.setContent(contentString);
+                    infoWindow.open(map, marker);
+                    showCustomInfoCard(restaurant);
+                });
+            });
+            
+            function showCustomInfoCard(restaurant) {
+                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
+
+                if (infoCard) {
+                    // Scroll to info card if it's not in view
+                    const cardRect = infoCard.getBoundingClientRect();
+                    const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+
+                    if (!isCardVisible) {
+                        infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+
+                    // Highlight the info card
+                    document.querySelectorAll('.info-card').forEach(card => {
+                        card.classList.remove('highlight');
+                    });
+                    infoCard.classList.add('highlight');
+                }
+            }
+
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const restaurantId = card.getAttribute('data-id');
+                    const restaurant = restaurantData.find(r => r.id === restaurantId);
+                    if (restaurant) {
+                        map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
+                        highlightMarker(restaurantId);
+                    }
+                });
+            });
+
+            function highlightInfoCard(restaurantId) {
+                document.querySelectorAll('.info-card').forEach(card => {
+                    if (card.getAttribute('data-id') === restaurantId) {
+                        card.classList.add('highlight');
+                    } else {
+                        card.classList.remove('highlight');
+                    }
+                });
+            }
+
+            function highlightMarker(restaurantId) {
+                markers.forEach(marker => {
+                    if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => marker.setAnimation(null), 1400);
+                    }
+                });
+            }
+            
+            // Function to fit map to contain all markers
+            function fitMapToBounds() {
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach(marker => {
+                    bounds.extend(marker.getPosition());
+                });
+                map.fitBounds(bounds);
+            }
+            
+            fitMapToBounds();
+        }
+
+
+        function getUserPos() {
+            let userPos;
+            if (infoWindow) {
+                infoWindow.close();
+            }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userPos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+
+                        map.setCenter(userPos);
+                        
+                        const userMarker = new google.maps.Marker({
+                        position: userPos,
+                        map: map,
+                        title: "Your Location",
+                        icon: {
+                            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                        }
+                    });
+
+                    markers.push(userMarker);
+
+
+                    },
+                    () => {
+                        handleLocationError(true, infoWindow, map.getCenter());
+                    },
+                );
+            } else {
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+            return userPos;
+        }
+        
+        async function nearbySearch() {
+          //@ts-ignore
+          const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
+            "places",
+          );
+          const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+          // Restrict within the map viewport.
+          let center = map.center;
+          const request = {
+            // required parameters
+            fields: ["displayName", "location", "businessStatus", ],
+            locationRestriction: {
+              center: center,
+              radius: 1000,
+            },
+            // optional parameters
+            includedPrimaryTypes: ["restaurant"],
+            maxResultCount: 5,
+            rankPreference: SearchNearbyRankPreference.POPULARITY,
+            language: "en-US",
+            region: "us",
+          };
+          //@ts-ignore
+          const { places } = await Place.searchNearby(request);
+                
+          if (places.length) {
+            console.log(places);
+    
+            const { LatLngBounds } = await google.maps.importLibrary("core");
+            const bounds = new LatLngBounds();
+    
+            // Loop through and get all the results.
+            places.forEach((place) => {
+                const pin = new PinElement({
+                    background: '#FBBC04',
+                    scale: 1,
+                });
+    
+              const marker = new AdvancedMarkerElement({
+                map,
+                position: place.location,
+                title: place.displayName,
+    
+                  content: pin.element,
+                  gmpClickable: true,
+              });
+    
+            marker.addListener("click", ({ domEvent, latLng }) => {
+                const { target } = domEvent;
+                infoWindow.close();
+                infoWindow.setContent(marker.title);
+                infoWindow.open(marker.map, marker);
+            });
+    
+              bounds.extend(place.location);
+              console.log(place);
+            });
+            map.fitBounds(bounds);
+          } else {
+            console.log("No results");
+          }
+        }
+
+    function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(
+            browserHasGeolocation
+                ? "Error: The Geolocation service failed."
+                : "Error: Your browser doesn't support geolocation.",
+        );
+        infoWindow.open(map);
+    }
+
+        initMap();
+    </script>
+
+
+
+
+
 
 </body>
 </html>

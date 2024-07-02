@@ -10,6 +10,18 @@
     <div style="width: 100%;">
         {% include 'polls/components/navbar.html' %}
     </div>
+    
+    <div class="card-grid">
+        {% if favorites %}
+            {% for favorite in favorites %}
+                <div class="info-card">
+                    {% include 'polls/components/infoCard.html' with detail=favorite%}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No favorites added yet.</p>
+        {% endif %}
+    </div>
 
 </body>
 </html>

@@ -83,3 +83,19 @@ body {
     font-size: 20px;
     padding-bottom: 4px;
 }
+
+.fav-button {
+    background-color: #ff6347;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.fav-button:hover {
+    background-color: #e5533d;
+}
