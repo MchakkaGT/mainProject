@@ -7,7 +7,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'polls/restaurantSearch.css' %}">
 
-    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+    <script>(g=>{
+        let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+            m = document, b = window;b=b[c]||(b[c]={});
+        const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+            u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script"));
+                e.set("libraries", [...r] + "");
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("callback", c + ".maps." + q);
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                d[q] = f;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a)
+            }));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f, ...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
         ({key: "AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0", v: "weekly"});</script>
 
 
@@ -33,9 +47,9 @@
             
             <div class="filters-container">
                 <div class="filter">
-                    <label for="rating">Minimum Rating:</label>
+                    <label for="rating"></label>
                     <select id="rating" name="rating">
-                        <option value="" selected>Any</option>
+                        <option value="" selected>Minimum Rating</option>
                         <option value="1">1+</option>
                         <option value="2">2+</option>
                         <option value="3">3+</option>
@@ -44,9 +58,9 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="max_price">Max Price Level:</label>
+                    <label for="max_price"></label>
                     <select id="max_price" name="max_price">
-                        <option value="" selected>Any</option>
+                        <option value="" selected>Max Price Level</option>
                         <option value="0">Free</option>
                         <option value="1">Inexpensive</option>
                         <option value="2">Moderate</option>
@@ -55,8 +69,8 @@
                     </select>
                 </div>
                 <div class="filter">
-                    <label for="distance">Max Distance (km):</label>
-                    <input type="number" id="distance" name="distance" placeholder="e.g., 5">
+                    <label for="distance"></label>
+                    <input type="number" id="distance" name="distance" placeholder="Max Distance (km): e.g., 5">
                 </div>
             </div>
             
@@ -115,7 +129,7 @@
         }
         
         async function searchResults() {
-            const restaurantData = {{ mapDetails|safe }};
+            const restaurantData = {{ mapDetails|default:"null"|safe }};
             if (!restaurantData || restaurantData.length === 0) {
                 console.log("no data");
                 return;

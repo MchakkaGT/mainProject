@@ -44,6 +44,8 @@
     </div>
 
     <script>
+        
+        // The JS function is provided by Django to get the CSRF token (Security Token).
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -63,6 +65,7 @@
 
         // Fetch favorite place IDs when the page loads
         $(document).ready(function() {
+            // Fetches the data then updates the buttons while loading.
             fetchFavoritePlaceIds().then(() => {
                 updateButtonText();
             });
@@ -74,7 +77,7 @@
                 url: '/polls/get_favorite_place_ids/',
                 type: 'GET',
                 success: function(response) {
-                    favoritePlaceIds = response;
+                        favoritePlaceIds = response;
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching favorite place IDs:', error);
@@ -86,6 +89,9 @@
         function updateButtonText() {
             const buttons = document.querySelectorAll('.fav-button');
             buttons.forEach(button => {
+                
+                // Selects all the buttons and checks with the json file to see if the place Ids match
+                // if they match they are supposed to display remove or display add.
                 const placeId = button.getAttribute('data-place_id');
                 if (favoritePlaceIds.includes(placeId)) {
                     button.textContent = 'Remove from Favorites';
@@ -102,6 +108,7 @@
             const isFavorite = favoritePlaceIds.includes(placeId);
 
             if (isFavorite) {
+                // When the promise is resolved, the lines inside the .then with run.
                 removeFromFavorites(placeId, csrftoken).then(() => {
                     button.textContent = 'Add to Favorites';
                     favoritePlaceIds = favoritePlaceIds.filter(id => id !== placeId);
@@ -116,6 +123,8 @@
                     rating: button.getAttribute('data-rating'),
                     image_url: button.getAttribute('data-image_url')
                 };
+                
+                // When the promise is resolved, the lines inside the .then with run.
                 addToFavorites(detail, csrftoken).then(() => {
                     button.textContent = 'Remove from Favorites';
                     favoritePlaceIds.push(placeId);
@@ -135,7 +144,6 @@
                 success: function(response) {
                     console.log("Successfully removed from favorites.");
                     window.location.reload();
-                    // Optionally, update button text or state here
                 },
                 error: function(xhr, status, error) {
                     console.error('Error removing from favorites:', error);
@@ -152,7 +160,6 @@
                 data: detail,
                 success: function(response) {
                     console.log("Successfully added to favorites.");
-                    // Optionally, update button text or state here
                 },
                 error: function(xhr, status, error) {
                     console.error('Error adding to favorites:', error);

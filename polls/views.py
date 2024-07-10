@@ -1,12 +1,8 @@
-
 import requests
 import json
-import uuid
 from django.shortcuts import render
 from datetime import datetime
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 
 from polls.models import Favorite
 
@@ -18,6 +14,7 @@ def home(request):
 
 # View function that is used to call on the restaurant_search page
 def restaurant_search(request):
+    # When submit button is clicked, the if statement gits the values in each field.
     if request.method == 'POST':
         query = request.POST.get('query', '')
         rating = request.POST.get('rating')
@@ -28,6 +25,7 @@ def restaurant_search(request):
         if distance:
             distance = int(distance) * 1000
 
+        # Gets data from the API and saves them in a variable.
         details = get_restaurant_details(query, rating, max_price, distance)
         details_json = json.dumps(details)
 
@@ -40,6 +38,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
     base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
+    # Parameters when calling the API for restaurant information.
     params = {
         'keyword': query,
         'key': api_key,
@@ -54,12 +53,15 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
     restaurants = []
     size = 0
 
+    # If the API returns restaurant data, I enter the if statement and get the data I want.
     if result.get('status') == 'OK' and 'results' in result:
         candidates = result.get('results', [])[:]
 
         for candidate in candidates:
             is_restaurant = 'restaurant' in candidate.get('types', [])
 
+            # The if statement works to filter out certain restaurants is the user asks for
+            # specific restaurant criteria.
             if candidate.get('price_level') and max_price:
                 is_max = float(candidate.get('price_level')) <= float(max_price)
             else:
@@ -73,8 +75,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
                 is_rating = True
 
             if is_restaurant and size < 9 and is_rating and is_max:
-
-                # Get restaurant details
+                # Creates an object which contains all the details.
                 candidate_details = {
                     'place_id': candidate.get('place_id'),
                     'name': candidate.get('name'),
@@ -88,8 +89,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
                     'lng': candidate['geometry']['location']['lng']
                 }
 
-
-                # Get specific details
+                # Get specific details from other APIs within Google.
                 details = get_details(candidate, api_key, candidate.get('place_id'))
                 candidate_details['open_hours'] = details.get('open_hours')
                 candidate_details['number'] = details.get('number')
@@ -101,6 +101,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
     return restaurants if restaurants else None
 
 
+# This function is used to call the photo API to retrieve a photo of the restaurant.
 def get_image(candidate, api_key):
     photo_base_url = 'https://maps.googleapis.com/maps/api/place/photo'
 
@@ -112,10 +113,13 @@ def get_image(candidate, api_key):
         return None
 
 
+# This function is used to get more specific data about a certain restaurant.
 def get_details(candidate, api_key, place_id):
     place_details_url = 'https://maps.googleapis.com/maps/api/place/details/json'
 
     if place_id:
+
+        # inputs to the API to get specific results.
         details_params = {
             'place_id': place_id,
             'key': api_key,
@@ -129,12 +133,14 @@ def get_details(candidate, api_key, place_id):
             detailed_info = details_result['result']
             opening_hours = detailed_info.get('opening_hours', {})
 
+            # Creates an object which contains the details we asked for.
             place_details = {
                 'open_hours': None,
                 'number': detailed_info.get('formatted_phone_number'),
                 'address': detailed_info.get('formatted_address'),
             }
 
+            # Logic to display current days opening hours.
             if opening_hours:
                 weekday_text = opening_hours.get('weekday_text', [])
 
@@ -151,11 +157,14 @@ def geolocation(request):
     return render(request, 'polls/geolocation.html')
 
 
+# Is a RestAPI call to Django Database to post data about a user's favorite restaurant.
 def add_to_favorites(request):
+    # If the user calls the method we check to see if the user called a post method.
     if request.method == 'POST':
         user = request.user
         data = request.POST
 
+        # Once we check that there is a logged-in user we get the data of the restaurant he wants to save.
         try:
             place_id = data.get('place_id')
             name = data.get('name')
@@ -167,6 +176,7 @@ def add_to_favorites(request):
             longitude = float(data.get('longitude', 0))
             image_url = data.get('image_url')
 
+            # We check to make sure the user hasn't already saved this restaurant by checking its place_id.
             if not Favorite.objects.filter(user=user, place_id=place_id).exists():
                 favorite = Favorite(
                     user=user,
@@ -195,10 +205,15 @@ def add_to_favorites(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 
+# Is a RestAPI call to Django Database to remove data about a certain user's favorite restaurant.
 def remove_from_favorites(request):
+
+    # Checks to see if the user calls a post method.
     if request.method == 'POST':
         place_id = request.POST.get('place_id')
         try:
+            # It located the item the user wants to delete by searching for its place_id and then deletes
+            # that data from the database for the specified user.
             favorite = Favorite.objects.get(user=request.user, place_id=place_id)
             favorite.delete()
             return JsonResponse({'message': 'Successfully removed from favorites.'}, status=200)
@@ -209,29 +224,43 @@ def remove_from_favorites(request):
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 
+# Is a RestAPI call to Django Database to fetch the place_ids of all the restaurants the user has saved.
 def get_favorite_place_ids(request):
-    favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
-    return JsonResponse(favorite_place_ids, safe=False)
+    if Favorite.objects.filter(user=request.user) is None:
+        return None
+    else:
+        favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
+        return JsonResponse(favorite_place_ids, safe=False)
 
 
+# Favorites page that displays the users favorite restaurant list.
 def favorites(request):
-    favorite_restaurants = Favorite.objects.all()
-    favorites_dict = [
-        {
-            'name': favorite.name,
-            'place_id': favorite.place_id,
-            'address': favorite.address,
-            'rating': favorite.rating,
-            'open_hours': favorite.open_hours,
-            'number': favorite.number,
-            'latitude': favorite.latitude,
-            'longitude': favorite.longitude,
-            'image_url': favorite.image_url
-        }
-        for favorite in favorite_restaurants
-    ]
 
-    return render(request, 'polls/favorites.html', {'favorites': favorites_dict})
+    # Checks to see if the user is logged in. If not then he does not have access to adding to Favorites
+    if not request.user.is_active:
+        return render(request, 'polls/favorites.html')
 
+    # Checks to see if the user has added any restaurants to favorites.
+    elif Favorite.objects.filter(user=request.user) is None:
+        return render(request, 'polls/favorites.html')
 
+    # if the other statements are false, then the user is both logged in and has items so we return the
+    # restaurant list as an object.
+    else:
+        favorite_restaurants = Favorite.objects.filter(user=request.user)
+        favorites_dict = [
+            {
+                'name': favorite.name,
+                'place_id': favorite.place_id,
+                'address': favorite.address,
+                'rating': favorite.rating,
+                'open_hours': favorite.open_hours,
+                'number': favorite.number,
+                'latitude': favorite.latitude,
+                'longitude': favorite.longitude,
+                'image_url': favorite.image_url
+            }
+            for favorite in favorite_restaurants
+        ]
 
+        return render(request, 'polls/favorites.html', {'favorites': favorites_dict})
