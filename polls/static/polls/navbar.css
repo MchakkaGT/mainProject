@@ -24,6 +24,26 @@ body {
     max-width: 1500px;
 }
 
+.nav-menu {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-gap: 10px;
+    list-style: none;
+    text-align: center;
+    width: 50vw;
+    justify-content: end;
+
+}
+
+.button-account {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-gap: 10px;
+    list-style: none;
+    text-align: center;
+
+}
+
 .navbar-logo {
     color: #fff;
     justify-self: start;
@@ -33,18 +53,6 @@ body {
     font-size: 2rem;
     display: flex;
     align-items: center;
-}
-
-.nav-menu {
-    display: grid;
-    grid-template-columns: repeat(4, auto);
-    grid-gap: 10px;
-    list-style: none;
-    text-align: center;
-    width: 60vw;
-    justify-content: end;
-    margin-right: 2rem;
-
 }
 
 .nav-item {
@@ -78,6 +86,7 @@ body {
     color: black;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, border-width 0.3s;
+    margin-top: 10px;
 }
 
 .btn:hover {

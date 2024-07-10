@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NavBar</title>
-    <link rel="stylesheet" href="{% static 'polls/stylesheets/../../../static/polls/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'polls/navbar.css' %}">
     
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-container">
             <a href="/polls" class="navbar-logo">
-                <img 
-                        src="{% static 'polls/images/logo.png' %}" 
-                        width="8%" 
-                        height="auto" 
+                <img
+                        src="{% static 'polls/images/logo.png' %}"
+                        width="8%"
+                        height="auto"
                         alt="Logo of website">
                 Taste of Atlanta
             </a>
@@ -27,14 +27,21 @@
                 <li class="nav-item">
                     <a href="/polls/restaurants_search" class="nav-links">Restaurant Search</a>
                 </li>
-                <li class="nav-item">
-                    <a href="/map" class="nav-links">Geolocation</a>
-                </li>
                 <li>
                     <a href="/polls/favorites" class="nav-links">Favorites</a>
                 </li>
             </ul>
-            <a href="/accounts/signup/" class="btn btn--outline">SIGN UP</a>
+        
+            <div class="button-account">
+                {% if user.is_authenticated %}
+                        <a href="/accounts/login/" class="btn" style="margin-left: 1rem; width: 6vw;">ACCOUNT</a>
+                    {% else %}
+                        <a href="/accounts/signup/" class="btn" style="margin-left: 0.75rem; width: 5vw;">SIGN UP</a>
+                        <a href="/accounts/login/" class="btn" style="width: 5vw;">LOGIN</a>
+                    {% endif %}
+            </div>
+            
+            
         </div>
     </nav>
 </body>

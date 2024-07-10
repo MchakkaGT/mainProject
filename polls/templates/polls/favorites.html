@@ -1,3 +1,4 @@
+{% load static %}
 
 
 <!DOCTYPE html>
@@ -5,21 +6,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Favorites Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'polls/favorites.css' %}">
 </head>
 <body>
     <div style="width: 100%;">
         {% include 'polls/components/navbar.html' %}
     </div>
     
-    <div class="card-grid">
-        {% if favorites %}
-            {% for favorite in favorites %}
-                <div class="info-card">
-                    {% include 'polls/components/infoCard.html' with detail=favorite%}
+    <div>
+        {% if not user.is_authenticated %}
+            <div class="auth-container">
+                <i class="fa-solid fa-user-lock"></i>
+                <div class="accounts">
+                    <button><a href="/accounts/signup/" class="">SIGN UP</a></button>
+                    <button><a href="/accounts/login/" class="">LOGIN</a></button>
                 </div>
-            {% endfor %}
+            </div>
         {% else %}
-            <p>No favorites added yet.</p>
+            <div class="card-grid">
+                {% if favorites %}
+                {% for favorite in favorites %}
+                    <div class="info-card">
+                        {% include 'polls/components/infoCard.html' with detail=favorite%}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No favorites added yet.</p>
+            {% endif %}
+            </div>
         {% endif %}
     </div>
 

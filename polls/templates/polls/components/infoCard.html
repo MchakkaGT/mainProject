@@ -13,7 +13,8 @@
     <div class="cards__item">
         <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
 
-    <button class="fav-button" onclick="buttonClicked(this)"
+    {% if user.is_authenticated %}
+        <button class="fav-button" onclick="buttonClicked(this)"
             data-place_id="{{ detail.place_id }}"
             data-name="{{ detail.name }}"
             data-address="{{ detail.address }}"
@@ -23,6 +24,8 @@
             data-image_url="{{ detail.image_url }}">
         Add to Favorites
     </button>
+    {% endif %}
+    
         <div class="info">
             <p class="restaurant-name">{{ detail.name }}</p>
             <p class="restaurant-address">{{ detail.address }}</p>
@@ -36,7 +39,6 @@
                 <span class="star"></span>
                 <span class="star"></span>
                 <span class="star"></span>
-                
             </div>
 
             <div class="restaurant-rating">{{ detail.rating }}</div>
