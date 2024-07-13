@@ -127,7 +127,7 @@
             await searchResults();
 
         }
-        
+
         async function searchResults() {
             const restaurantData = {{ mapDetails|default:"null"|safe }};
             if (!restaurantData || restaurantData.length === 0) {
@@ -161,7 +161,7 @@
                     showCustomInfoCard(restaurant);
                 });
             });
-            
+
             function showCustomInfoCard(restaurant) {
                 const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
 
@@ -173,12 +173,7 @@
                     if (!isCardVisible) {
                         infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
-
-                    // Highlight the info card
-                    document.querySelectorAll('.info-card').forEach(card => {
-                        card.classList.remove('highlight');
-                    });
-                    infoCard.classList.add('highlight');
+                    
                 }
             }
 
@@ -188,29 +183,9 @@
                     const restaurant = restaurantData.find(r => r.id === restaurantId);
                     if (restaurant) {
                         map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
-                        highlightMarker(restaurantId);
                     }
                 });
             });
-
-            function highlightInfoCard(restaurantId) {
-                document.querySelectorAll('.info-card').forEach(card => {
-                    if (card.getAttribute('data-id') === restaurantId) {
-                        card.classList.add('highlight');
-                    } else {
-                        card.classList.remove('highlight');
-                    }
-                });
-            }
-
-            function highlightMarker(restaurantId) {
-                markers.forEach(marker => {
-                    if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
-                        marker.setAnimation(google.maps.Animation.BOUNCE);
-                        setTimeout(() => marker.setAnimation(null), 1400);
-                    }
-                });
-            }
             
             // Function to fit map to contain all markers
             function fitMapToBounds() {
@@ -220,7 +195,7 @@
                 });
                 map.fitBounds(bounds);
             }
-            
+
             fitMapToBounds();
         }
 
@@ -239,7 +214,7 @@
                         };
 
                         map.setCenter(userPos);
-                        
+
                         const userMarker = new google.maps.Marker({
                         position: userPos,
                         map: map,
@@ -262,7 +237,7 @@
             }
             return userPos;
         }
-        
+
         async function nearbySearch() {
           //@ts-ignore
           const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
@@ -287,36 +262,36 @@
           };
           //@ts-ignore
           const { places } = await Place.searchNearby(request);
-                
+
           if (places.length) {
             console.log(places);
-    
+
             const { LatLngBounds } = await google.maps.importLibrary("core");
             const bounds = new LatLngBounds();
-    
+
             // Loop through and get all the results.
             places.forEach((place) => {
                 const pin = new PinElement({
                     background: '#FBBC04',
                     scale: 1,
                 });
-    
+
               const marker = new AdvancedMarkerElement({
                 map,
                 position: place.location,
                 title: place.displayName,
-    
+
                   content: pin.element,
                   gmpClickable: true,
               });
-    
+
             marker.addListener("click", ({ domEvent, latLng }) => {
                 const { target } = domEvent;
                 infoWindow.close();
                 infoWindow.setContent(marker.title);
                 infoWindow.open(marker.map, marker);
             });
-    
+
               bounds.extend(place.location);
               console.log(place);
             });
