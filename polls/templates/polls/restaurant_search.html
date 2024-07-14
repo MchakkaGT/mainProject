@@ -115,9 +115,8 @@
         
         async function initMap() {
             const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-            map = new google.maps.Map(document.getElementById("map"), {
+            map = new Map(document.getElementById("map"), {
                 center: pos, // Default center coordinates (can be any starting point)
                 zoom: 15,
                 mapId: "123891748939",
@@ -133,7 +132,7 @@
             locationButton.addEventListener("click", () => {
                 getUserPos();
             });
-            infoWindow = new google.maps.InfoWindow();
+            infoWindow = new InfoWindow();
 
             await nearbySearch();
             await searchResults();
@@ -141,6 +140,7 @@
         }
         
         async function searchResults() {
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
             const restaurantData = {{ mapDetails|default:"null"|safe }};
             if (!restaurantData || restaurantData.length === 0) {
                 return;
@@ -148,14 +148,13 @@
             const markers = [];
             // Add markers for restaurants
             restaurantData.forEach(restaurant => {
-                const marker = new google.maps.Marker({
+                const marker = new AdvancedMarkerElement({
+                    map,
                     position: {lat: restaurant.lat, lng: restaurant.lng},
-                    map: map,
                     title: restaurant.name
                 });
 
                 markers.push(marker);
-
 
                 let contentString = `<div>
                                 <h3>${restaurant.name}</h3>
@@ -169,11 +168,11 @@
                     infoWindow.close();
                     infoWindow.setContent(contentString);
                     infoWindow.open(map, marker);
-                    showCustomInfoCard(restaurant);
+                    showCustomInfoCard(restaurant, markers);
                 });
             });
-            
-            function showCustomInfoCard(restaurant) {
+
+            function showCustomInfoCard(restaurant, markers) {
                 const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
 
                 if (infoCard) {
@@ -199,12 +198,12 @@
                     const restaurant = restaurantData.find(r => r.id === restaurantId);
                     if (restaurant) {
                         map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
-                        highlightMarker(restaurantId);
+                        highlightMarker(restaurantId, markers);
                     }
                 });
             });
 
-            function highlightInfoCard(restaurantId) {
+            function highlightInfoCard(restaurantId, markers) {
                 document.querySelectorAll('.info-card').forEach(card => {
                     if (card.getAttribute('data-id') === restaurantId) {
                         card.classList.add('highlight');
@@ -214,7 +213,7 @@
                 });
             }
 
-            function highlightMarker(restaurantId) {
+            function highlightMarker(restaurantId, markers) {
                 markers.forEach(marker => {
                     if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
                         marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -222,22 +221,23 @@
                     }
                 });
             }
-            
+
             // Function to fit map to contain all markers
-            function fitMapToBounds() {
+            function fitMapToBounds(markers) {
                 const bounds = new google.maps.LatLngBounds();
                 markers.forEach(marker => {
-                    bounds.extend(marker.getPosition());
+                    bounds.extend(marker.position);
                 });
                 map.fitBounds(bounds);
             }
-            
-            fitMapToBounds();
+
+            fitMapToBounds(markers);
         }
 
 
-        function getUserPos() {
-            let userPos;
+        async function getUserPos() {
+            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+            let userPos = { lat: 33.77683196783757, lng: -84.39622529694923 };
             if (infoWindow) {
                 infoWindow.close();
             }
@@ -250,18 +250,19 @@
                         };
 
                         map.setCenter(userPos);
-                        
-                        const userMarker = new google.maps.Marker({
-                        position: userPos,
-                        map: map,
-                        title: "Your Location",
-                        icon: {
-                            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                        }
-                    });
 
-                    markers.push(userMarker);
+                        const userPin = document.createElement("img");
+                        userPin.src = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
 
+                        const userMarker = new AdvancedMarkerElement({
+                            map,
+                            position: userPos,
+                            title: "Your Location",
+                            content: userPin,
+                        });
+
+                        sendUser(userPos);
+                        markers.push(userMarker);
 
                     },
                     () => {
@@ -392,10 +393,32 @@
             }
         });
     }
+
+    function sendUser(position) {
+        const csrftoken = getCookie('csrftoken');
+
+        const posCoords = {
+            lat: position.lat,
+            lng: position.lng
+        };
+
+        return $.ajax({
+            url: '/polls/restaurants_search/',
+            type: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            data: JSON.stringify(posCoords),
+            contentType: 'application/json',
+            success: function(response) {
+                console.log("Successfully sent the location.");
+                console.log(posCoords);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error sending the location:', error);
+            }
+        });
+    }
     
     initMap()
-        
-
 
     </script>
 

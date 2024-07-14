@@ -21,13 +21,14 @@ def restaurant_search(request):
             rating = request.POST.get('rating')
             max_price = request.POST.get('max_price')
             distance = request.POST.get('distance')
+            coords = request.POST.get('posCoords')
 
             # Convert distance to meters if specified
             if distance:
                 distance = int(distance) * 1000
 
             # Gets data from the API and saves them in a variable.
-            details = get_restaurant_details(query, rating, max_price, distance)
+            details = get_restaurant_details(query, rating, max_price, distance, coords)
             details_json = json.dumps(details)
 
             return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
@@ -42,7 +43,7 @@ def restaurant_search(request):
 
 
 # Function to retrieve restaurants sorted by distance
-def get_restaurant_details(query, rating=None, max_price=None, distance=None):
+def get_restaurant_details(query, rating=None, max_price=None, distance=None, coords=None):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
     base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
@@ -51,9 +52,10 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None):
         'keyword': query,
         'key': api_key,
         'type': 'restaurant',
-        'location': '33.77683196783757, -84.39622529694923',
+        'location': '33.77683196783757, -84.39622529694923', # set to coords when data is formatted correctly
         'radius': distance or 5000
     }
+
 
     response = requests.get(base_url, params=params)
     result = response.json()
