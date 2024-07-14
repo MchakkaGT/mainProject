@@ -14,22 +14,30 @@ def home(request):
 
 # View function that is used to call on the restaurant_search page
 def restaurant_search(request):
-    # When submit button is clicked, the if statement gits the values in each field.
+    # When submit button is clicked, the if statement gets the values in each field.
     if request.method == 'POST':
-        query = request.POST.get('query', '')
-        rating = request.POST.get('rating')
-        max_price = request.POST.get('max_price')
-        distance = request.POST.get('distance')
+        if request.POST.get('query'):
+            query = request.POST.get('query', '')
+            rating = request.POST.get('rating')
+            max_price = request.POST.get('max_price')
+            distance = request.POST.get('distance')
 
-        # Convert distance to meters if specified
-        if distance:
-            distance = int(distance) * 1000
+            # Convert distance to meters if specified
+            if distance:
+                distance = int(distance) * 1000
 
-        # Gets data from the API and saves them in a variable.
-        details = get_restaurant_details(query, rating, max_price, distance)
-        details_json = json.dumps(details)
+            # Gets data from the API and saves them in a variable.
+            details = get_restaurant_details(query, rating, max_price, distance)
+            details_json = json.dumps(details)
 
-        return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
+            return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
+
+        elif request.body:
+            data = json.loads(request.body)
+            places = data.get('places', [])
+            print(places)
+            return render(request, 'polls/restaurant_search.html', {'places': places})
+
     return render(request, 'polls/restaurant_search.html', {})
 
 
@@ -227,7 +235,7 @@ def remove_from_favorites(request):
 # Is a RestAPI call to Django Database to fetch the place_ids of all the restaurants the user has saved.
 def get_favorite_place_ids(request):
     if Favorite.objects.filter(user=request.user) is None:
-        return None
+        return "Empty"
     else:
         favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
         return JsonResponse(favorite_place_ids, safe=False)

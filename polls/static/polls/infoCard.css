@@ -85,7 +85,7 @@ body {
 }
 
 .fav-button {
-    background-color: #ff6347;
+    background-color: #4CAF50;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -97,5 +97,64 @@ body {
 }
 
 .fav-button:hover {
-    background-color: #e5533d;
+    background-color: #45a049;
 }
+
+.detailedPg {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 12px 20px; /* Padding */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.detailedPg:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 85%; /* Could be more or less, depending on screen size */
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 10px;
+}
+
