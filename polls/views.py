@@ -7,10 +7,21 @@ from django.http import JsonResponse
 from polls.models import Favorite
 
 
+lat = None
+lng = None
 # View function to call on the home page
 def home(request):
     return render(request, 'polls/home.html')
 
+def get_location(request):
+    print("Got here")
+    if request.method == 'POST':
+        print("Got here")
+        # data = json.loads(request.body)
+        # coord = data.get('coords', [])
+        # print(coord)
+        # lat = coord.get('lat')
+        # lng = coord.get('lng')
 
 # View function that is used to call on the restaurant_search page
 def restaurant_search(request):
@@ -21,14 +32,17 @@ def restaurant_search(request):
             rating = request.POST.get('rating')
             max_price = request.POST.get('max_price')
             distance = request.POST.get('distance')
-            coords = request.POST.get('posCoords')
+
+            print(lat)
+            print(lng)
+
 
             # Convert distance to meters if specified
             if distance:
                 distance = int(distance) * 1000
 
             # Gets data from the API and saves them in a variable.
-            details = get_restaurant_details(query, rating, max_price, distance, coords)
+            details = get_restaurant_details(query, rating, max_price, distance)
             details_json = json.dumps(details)
 
             return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
@@ -36,7 +50,7 @@ def restaurant_search(request):
         elif request.body:
             data = json.loads(request.body)
             places = data.get('places', [])
-            print(places)
+            # print(places)
             return render(request, 'polls/restaurant_search.html', {'places': places})
 
     return render(request, 'polls/restaurant_search.html', {})
@@ -96,7 +110,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None, co
                     'open_hours': None,
                     'number': None,
                     'lat': candidate['geometry']['location']['lat'],
-                    'lng': candidate['geometry']['location']['lng']
+                    'lng': candidate['geometry']['location']['lng'],
                 }
 
                 # Get specific details from other APIs within Google.
@@ -104,6 +118,8 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None, co
                 candidate_details['open_hours'] = details.get('open_hours')
                 candidate_details['number'] = details.get('number')
                 candidate_details['address'] = details.get('address')
+                candidate_details['reviews'] = details.get('reviews')
+                # print(details.get('reviews'))
 
                 restaurants.append(candidate_details)
                 size += 1
@@ -148,7 +164,9 @@ def get_details(candidate, api_key, place_id):
                 'open_hours': None,
                 'number': detailed_info.get('formatted_phone_number'),
                 'address': detailed_info.get('formatted_address'),
+                'reviews': detailed_info.get('reviews')
             }
+            # print(detailed_info.get('reviews'))
 
             # Logic to display current days opening hours.
             if opening_hours:

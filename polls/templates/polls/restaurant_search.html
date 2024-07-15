@@ -262,7 +262,9 @@
                         });
 
                         sendUser(userPos);
-                        markers.push(userMarker);
+
+
+
 
                     },
                     () => {
@@ -285,14 +287,14 @@
           let center = map.center;
           const request = {
             // required parameters
-            fields: ["displayName", "location", "businessStatus", "id", "adrFormatAddress", "rating"],
+            fields: ["displayName", "location", "businessStatus", "id", "adrFormatAddress", "rating", "reviews"],
             locationRestriction: {
               center: center,
               radius: 1000,
             },
             // optional parameters
             includedPrimaryTypes: ["restaurant"],
-            maxResultCount: 5,
+            maxResultCount: 6,
             rankPreference: SearchNearbyRankPreference.POPULARITY,
             language: "en-US",
             region: "us",
@@ -301,13 +303,23 @@
           const { places } = await Place.searchNearby(request);
                 
           if (places.length) {
+              console.log(places);
 
             const { LatLngBounds } = await google.maps.importLibrary("core");
             const bounds = new LatLngBounds();
-            await sendPlaces(places)
+            {#await sendPlaces(places)#}
     
             // Loop through and get all the results.
             places.forEach((place) => {
+    {#            const reviews = place.reviews;#}
+    {#reviews.forEach((review) => {#}
+    {#    console.log(review.publishTime);#}
+    {#    console.log(`Review: ${review.text}`);#}
+    {#    console.log(`Rating: ${review.rating}`);#}
+    {#    console.log('---');#}
+
+
+
                 const pin = new PinElement({
                     background: '#FBBC04',
                     scale: 1,
@@ -363,37 +375,6 @@
         return cookieValue;
     }
 
-        // Function to add to favorites
-    function sendPlaces(places) {
-        const csrftoken = getCookie('csrftoken');
-
-        const placesData = places.map(place => ({
-            id: place.id,
-            name: place.displayName,
-            location: {
-                lat: place.location.lat(),
-                lng: place.location.lng()
-            },
-            rating: place.rating,
-            // Add any other necessary fields
-        }));
-
-        return $.ajax({
-            url: '/polls/restaurants_search/',
-            type: 'POST',
-            headers: {'X-CSRFToken': csrftoken},
-            data: JSON.stringify({ places: placesData }),
-            contentType: 'application/json',
-            success: function(response) {
-                console.log("Successfully sent the data.");
-                console.log(placesData);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error sending the data:', error);
-            }
-        });
-    }
-
     function sendUser(position) {
         const csrftoken = getCookie('csrftoken');
 
@@ -402,8 +383,9 @@
             lng: position.lng
         };
 
+        console.log(posCoords);
         return $.ajax({
-            url: '/polls/restaurants_search/',
+            url: '/polls/get_location/',
             type: 'POST',
             headers: {'X-CSRFToken': csrftoken},
             data: JSON.stringify(posCoords),
@@ -417,8 +399,8 @@
             }
         });
     }
-    
-    initMap()
+
+    initMap();
 
     </script>
 
