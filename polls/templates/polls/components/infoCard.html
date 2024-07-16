@@ -66,7 +66,10 @@
             <p id="modal-number"></p>
             <p id="modal-rating"></p>
             <img id="modal-image_url" src="" alt="Restaurant Image">
+            <p id="modal-reviews"></p>
         </div>
+
+
     </div>
 
 {#      Functionality to add and remove from favorites#}
@@ -199,6 +202,7 @@
 
     {# Detailed view#}
     <script>
+
         // Detailed view
         function expandCard(button) {
             const modal = document.getElementById("detailModal");
@@ -210,6 +214,7 @@
             document.getElementById("modal-rating").textContent = "Rating: " + button.getAttribute('data-rating');
             document.getElementById("modal-image_url").src = button.getAttribute('data-image_url');
 
+            getReviews(button.getAttribute('data-place_id'));
             modal.style.display = "block";
         }
 
@@ -218,6 +223,35 @@
 
             modal.style.display = "none";
         }
+
+        async function getReviews(placeId) {
+            const {Place} = await google.maps.importLibrary("places");
+            const place = new Place({
+                id: placeId
+            })
+
+            await place.fetchFields({
+                fields: ["reviews"],
+            });
+            const reviews = place.reviews;
+            let reviewsContent = '';
+            {#reviews.forEach((review) => {#}
+            {#    reviewsContent += `Review: ${review.text}\n`;#}
+            {#    reviewsContent += `Rating: ${review.rating}\n\n`;#}
+            {# }); #}
+            {#document.getElementById("modal-reviews").textContent = reviewsContent;#}
+
+            reviews.forEach ((review) => {
+                reviewsContent += `<p>Review: ${review.text}</p>`;
+                reviewsContent += `<p>Rating: ${review.rating}</p>`;
+            })
+            document.getElementById("modal-reviews").innerHTML = reviewsContent;
+        }
+
+
+
+
+
     </script>
 
 
