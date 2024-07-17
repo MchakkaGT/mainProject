@@ -112,6 +112,7 @@
 <script>
         let map, infoWindow;
         let pos = { lat: 33.77683196783757, lng: -84.39622529694923 };
+        const markers = [];
         
         async function initMap() {
             const { Map, InfoWindow } = await google.maps.importLibrary("maps");
@@ -145,7 +146,6 @@
             if (!restaurantData || restaurantData.length === 0) {
                 return;
             }
-            const markers = [];
             // Add markers for restaurants
             restaurantData.forEach(restaurant => {
                 const marker = new AdvancedMarkerElement({
@@ -172,7 +172,7 @@
                 });
             });
 
-            function showCustomInfoCard(restaurant, markers) {
+            function showCustomInfoCard(restaurant) {
                 const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
 
                 if (infoCard) {
@@ -203,7 +203,7 @@
                 });
             });
 
-            function highlightInfoCard(restaurantId, markers) {
+            function highlightInfoCard(restaurantId) {
                 document.querySelectorAll('.info-card').forEach(card => {
                     if (card.getAttribute('data-id') === restaurantId) {
                         card.classList.add('highlight');
@@ -213,7 +213,7 @@
                 });
             }
 
-            function highlightMarker(restaurantId, markers) {
+            function highlightMarker(restaurantId) {
                 markers.forEach(marker => {
                     if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
                         marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -223,7 +223,7 @@
             }
 
             // Function to fit map to contain all markers
-            function fitMapToBounds(markers) {
+            function fitMapToBounds() {
                 const bounds = new google.maps.LatLngBounds();
                 markers.forEach(marker => {
                     bounds.extend(marker.position);

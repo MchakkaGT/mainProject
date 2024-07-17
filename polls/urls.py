@@ -8,6 +8,7 @@ urlpatterns = [
     path('restaurants_search/', views.restaurant_search, name='restaurant_search'),
     path('geolocation/', views.geolocation, name='geolocation'),
     path('favorites/', views.favorites, name='favorites'),
+    path('test/', views.test, name='test'),
 
     # Get user location
     path('get_location/', views.restaurant_search, name='get_location'),
@@ -16,4 +17,6 @@ urlpatterns = [
     path('add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),
     path('remove_from_favorites/', views.remove_from_favorites, name='remove_from_favorites'),
     path('get_favorite_place_ids/', views.get_favorite_place_ids, name='get_favorite_place_ids')
+
+
 ]

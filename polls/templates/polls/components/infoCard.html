@@ -13,18 +13,18 @@
     <div class="cards__item">
         <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
 
-{#        {% if user.is_authenticated %}#}
-{#            <button class="fav-button" onclick="buttonClicked(this)"#}
-{#                data-place_id="{{ detail.place_id }}"#}
-{#                data-name="{{ detail.name }}"#}
-{#                data-address="{{ detail.address }}"#}
-{#                data-open_hours="{{ detail.open_hours }}"#}
-{#                data-number="{{ detail.number }}"#}
-{#                data-rating="{{ detail.rating }}"#}
-{#                data-image_url="{{ detail.image_url }}">#}
-{#            Add to Favorites#}
-{#        </button>#}
-{#        {% endif %}#}
+        {% if user.is_authenticated %}
+            <button class="fav-button" onclick="buttonClicked(this)"
+                data-place_id="{{ detail.place_id }}"
+                data-name="{{ detail.name }}"
+                data-address="{{ detail.address }}"
+                data-open_hours="{{ detail.open_hours }}"
+                data-number="{{ detail.number }}"
+                data-rating="{{ detail.rating }}"
+                data-image_url="{{ detail.image_url }}">
+            Add to Favorites
+        </button>
+        {% endif %}
     
         <div class="info">
             <p class="restaurant-name">{{ detail.name}}</p>
@@ -44,14 +44,7 @@
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
 
-        <button class="detailedPg" onclick="expandCard(this)"
-                data-place_id="{{ detail.place_id }}"
-                data-name="{{ detail.name }}"
-                data-address="{{ detail.address }}"
-                data-open_hours="{{ detail.open_hours }}"
-                data-number="{{ detail.number }}"
-                data-rating="{{ detail.rating }}"
-                data-image_url="{{ detail.image_url }}">
+        <button class="detailedPg" onclick="expandCard(this)">
             More Details
         </button>
     </div>
@@ -60,145 +53,140 @@
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeWindow(this)">X</span>
-            <h2 id="modal-name"></h2>
-            <p id="modal-address"></p>
-            <p id="modal-open_hours"></p>
-            <p id="modal-number"></p>
-            <p id="modal-rating"></p>
-            <img id="modal-image_url" src="" alt="Restaurant Image">
-            <p id="modal-reviews"></p>
+            {% include 'polls/test.html' with place_id=detail.place_id %}
         </div>
-
-
     </div>
 
+
+    
+
 {#      Functionality to add and remove from favorites#}
-{#    <script>#}
-{##}
-{#        // The JS function is provided by Django to get the CSRF token (Security Token).#}
-{#        function getCookie(name) {#}
-{#            let cookieValue = null;#}
-{#            if (document.cookie && document.cookie !== '') {#}
-{#                const cookies = document.cookie.split(';');#}
-{#                for (let i = 0; i < cookies.length; i++) {#}
-{#                    const cookie = cookies[i].trim();#}
-{#                    if (cookie.substring(0, name.length + 1) === (name + '=')) {#}
-{#                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));#}
-{#                        break;#}
-{#                    }#}
-{#                }#}
-{#            }#}
-{#            return cookieValue;#}
-{#        }#}
-{##}
-{#        let favoritePlaceIds = [];#}
-{##}
-{#        // Fetch favorite place IDs when the page loads#}
-{#        $(document).ready(function() {#}
-{#            // Fetches the data then updates the buttons while loading.#}
-{#            fetchFavoritePlaceIds().then(() => {#}
-{#                if (favoritePlaceIds !== "Empty") {#}
-{#                    updateButtonText();#}
-{#                }#}
-{#            });#}
-{#        });#}
-{##}
-{#        // Function to fetch favorite place IDs#}
-{#        function fetchFavoritePlaceIds() {#}
-{#            return $.ajax({#}
-{#                url: '/polls/get_favorite_place_ids/',#}
-{#                type: 'GET',#}
-{#                success: function(response) {#}
-{#                        favoritePlaceIds = response;#}
-{#                },#}
-{#                error: function(xhr, status, error) {#}
-{#                    console.error('Error fetching favorite place IDs:', error);#}
-{#                }#}
-{#            });#}
-{#        }#}
-{##}
-{#        // Function to update button text based on favorite status#}
-{#        function updateButtonText() {#}
-{#            const buttons = document.querySelectorAll('.fav-button');#}
-{#            buttons.forEach(button => {#}
-{##}
-{#                // Selects all the buttons and checks with the json file to see if the place Ids match#}
-{#                // if they match they are supposed to display remove or display add.#}
-{#                const placeId = button.getAttribute('data-place_id');#}
-{#                if (favoritePlaceIds.includes(placeId)) {#}
-{#                    button.textContent = 'Remove from Favorites';#}
-{#                } else {#}
-{#                    button.textContent = 'Add to Favorites';#}
-{#                }#}
-{#            });#}
-{#        }#}
-{##}
-{#        // Function to handle button click#}
-{#        function buttonClicked(button) {#}
-{#            const csrftoken = getCookie('csrftoken');#}
-{#            const placeId = button.getAttribute('data-place_id');#}
-{#            const isFavorite = favoritePlaceIds.includes(placeId);#}
-{##}
-{#            if (isFavorite) {#}
-{#                // When the promise is resolved, the lines inside the .then with run.#}
-{#                removeFromFavorites(placeId, csrftoken).then(() => {#}
-{#                    button.textContent = 'Add to Favorites';#}
-{#                    favoritePlaceIds = favoritePlaceIds.filter(id => id !== placeId);#}
-{#                });#}
-{#            } else {#}
-{#                const detail = {#}
-{#                    place_id: button.getAttribute('data-place_id'),#}
-{#                    name: button.getAttribute('data-name'),#}
-{#                    address: button.getAttribute('data-address'),#}
-{#                    open_hours: button.getAttribute('data-open_hours'),#}
-{#                    number: button.getAttribute('data-number'),#}
-{#                    rating: button.getAttribute('data-rating'),#}
-{#                    image_url: button.getAttribute('data-image_url')#}
-{#                };#}
-{##}
-{#                // When the promise is resolved, the lines inside the .then with run.#}
-{#                addToFavorites(detail, csrftoken).then(() => {#}
-{#                    button.textContent = 'Remove from Favorites';#}
-{#                    favoritePlaceIds.push(placeId);#}
-{#                });#}
-{#            }#}
-{#        }#}
-{##}
-{#        // Function to remove from favorites#}
-{#        function removeFromFavorites(placeId, csrftoken) {#}
-{#            return $.ajax({#}
-{#                url: '/polls/remove_from_favorites/',#}
-{#                type: 'POST',#}
-{#                headers: {'X-CSRFToken': csrftoken},#}
-{#                data: {#}
-{#                    place_id: placeId#}
-{#                },#}
-{#                success: function(response) {#}
-{#                    console.log("Successfully removed from favorites.");#}
-{#                    window.location.reload();#}
-{#                },#}
-{#                error: function(xhr, status, error) {#}
-{#                    console.error('Error removing from favorites:', error);#}
-{#                }#}
-{#            });#}
-{#        }#}
-{##}
-{#        // Function to add to favorites#}
-{#        function addToFavorites(detail, csrftoken) {#}
-{#            return $.ajax({#}
-{#                url: '/polls/add_to_favorites/',#}
-{#                type: 'POST',#}
-{#                headers: {'X-CSRFToken': csrftoken},#}
-{#                data: detail,#}
-{#                success: function(response) {#}
-{#                    console.log("Successfully added to favorites.");#}
-{#                },#}
-{#                error: function(xhr, status, error) {#}
-{#                    console.error('Error adding to favorites:', error);#}
-{#                }#}
-{#            });#}
-{#        }#}
-{#    </script>#}
+    <script>
+
+        // The JS function is provided by Django to get the CSRF token (Security Token).
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        let favoritePlaceIds = [];
+
+        // Fetch favorite place IDs when the page loads
+        $(document).ready(function() {
+            // Fetches the data then updates the buttons while loading.
+            fetchFavoritePlaceIds().then(() => {
+                if (favoritePlaceIds !== "Empty") {
+                    updateButtonText();
+                }
+            });
+        });
+
+        // Function to fetch favorite place IDs
+        function fetchFavoritePlaceIds() {
+            return $.ajax({
+                url: '/polls/get_favorite_place_ids/',
+                type: 'GET',
+                success: function(response) {
+                        favoritePlaceIds = response;
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching favorite place IDs:', error);
+                }
+            });
+        }
+
+        // Function to update button text based on favorite status
+        function updateButtonText() {
+            const buttons = document.querySelectorAll('.fav-button');
+            buttons.forEach(button => {
+
+                // Selects all the buttons and checks with the json file to see if the place Ids match
+                // if they match they are supposed to display remove or display add.
+                const placeId = button.getAttribute('data-place_id');
+                if (favoritePlaceIds.includes(placeId)) {
+                    button.textContent = 'Remove from Favorites';
+                } else {
+                    button.textContent = 'Add to Favorites';
+                }
+            });
+        }
+
+        // Function to handle button click
+        function buttonClicked(button) {
+            const csrftoken = getCookie('csrftoken');
+            const placeId = button.getAttribute('data-place_id');
+            const isFavorite = favoritePlaceIds.includes(placeId);
+
+            if (isFavorite) {
+                // When the promise is resolved, the lines inside the .then with run.
+                removeFromFavorites(placeId, csrftoken).then(() => {
+                    button.textContent = 'Add to Favorites';
+                    favoritePlaceIds = favoritePlaceIds.filter(id => id !== placeId);
+                });
+            } else {
+                const detail = {
+                    place_id: button.getAttribute('data-place_id'),
+                    name: button.getAttribute('data-name'),
+                    address: button.getAttribute('data-address'),
+                    open_hours: button.getAttribute('data-open_hours'),
+                    number: button.getAttribute('data-number'),
+                    rating: button.getAttribute('data-rating'),
+                    image_url: button.getAttribute('data-image_url')
+                };
+
+                // When the promise is resolved, the lines inside the .then with run.
+                addToFavorites(detail, csrftoken).then(() => {
+                    button.textContent = 'Remove from Favorites';
+                    favoritePlaceIds.push(placeId);
+                });
+            }
+        }
+
+        // Function to remove from favorites
+        function removeFromFavorites(placeId, csrftoken) {
+            return $.ajax({
+                url: '/polls/remove_from_favorites/',
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    place_id: placeId
+                },
+                success: function(response) {
+                    console.log("Successfully removed from favorites.");
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error removing from favorites:', error);
+                }
+            });
+        }
+
+        // Function to add to favorites
+        function addToFavorites(detail, csrftoken) {
+            return $.ajax({
+                url: '/polls/add_to_favorites/',
+                type: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                data: detail,
+                success: function(response) {
+                    console.log("Successfully added to favorites.");
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error adding to favorites:', error);
+                }
+            });
+        }
+    </script>
 
     {# Detailed view#}
     <script>
@@ -206,15 +194,7 @@
         // Detailed view
         function expandCard(button) {
             const modal = document.getElementById("detailModal");
-
-            document.getElementById("modal-name").textContent = button.getAttribute('data-name');
-            document.getElementById("modal-address").textContent = button.getAttribute('data-address');
-            document.getElementById("modal-open_hours").textContent = "Open Hours: " + button.getAttribute('data-open_hours');
-            document.getElementById("modal-number").textContent = "Phone Number: " + button.getAttribute('data-number');
-            document.getElementById("modal-rating").textContent = "Rating: " + button.getAttribute('data-rating');
-            document.getElementById("modal-image_url").src = button.getAttribute('data-image_url');
-
-            getReviews(button.getAttribute('data-place_id'));
+            
             modal.style.display = "block";
         }
 
@@ -223,30 +203,7 @@
 
             modal.style.display = "none";
         }
-
-        async function getReviews(placeId) {
-            const {Place} = await google.maps.importLibrary("places");
-            const place = new Place({
-                id: placeId
-            })
-
-            await place.fetchFields({
-                fields: ["reviews"],
-            });
-            const reviews = place.reviews;
-            let reviewsContent = '';
-            {#reviews.forEach((review) => {#}
-            {#    reviewsContent += `Review: ${review.text}\n`;#}
-            {#    reviewsContent += `Rating: ${review.rating}\n\n`;#}
-            {# }); #}
-            {#document.getElementById("modal-reviews").textContent = reviewsContent;#}
-
-            reviews.forEach ((review) => {
-                reviewsContent += `<p>Review: ${review.text}</p>`;
-                reviewsContent += `<p>Rating: ${review.rating}</p>`;
-            })
-            document.getElementById("modal-reviews").innerHTML = reviewsContent;
-        }
+        
 
 
 

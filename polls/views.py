@@ -13,6 +13,9 @@ lng = None
 def home(request):
     return render(request, 'polls/home.html')
 
+def test(request):
+    return render(request, 'polls/test.html')
+
 def get_location(request):
     print("Got here")
     if request.method == 'POST':
