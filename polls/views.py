@@ -13,8 +13,8 @@ lng = None
 def home(request):
     return render(request, 'polls/home.html')
 
-def test(request):
-    return render(request, 'polls/test.html')
+def details(request):
+    return render(request, 'polls/details.html')
 
 def get_location(request):
     print("Got here")

@@ -22,7 +22,7 @@
                 a.nonce = m.querySelector("script[nonce]")?.nonce || "";
                 m.head.append(a)
             }));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f, ...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-        ({key: "AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0", v: "weekly"});</script>
+        ({key: "AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0", v: "beta"});</script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
 
@@ -84,7 +84,7 @@
             {% if details %}
 
                 {% for detail in details %}
-                    <div class="info-card" data-id="{{ detail.id }}">
+                    <div class="info-card" data-id="{{ detail.place_id }}">
                         {% include 'polls/components/infoCard.html' with detail=detail %}
                     </div>
                 {% endfor %}
@@ -138,9 +138,11 @@
             await nearbySearch();
             await searchResults();
 
+
         }
-        
+
         async function searchResults() {
+
             const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
             const restaurantData = {{ mapDetails|default:"null"|safe }};
             if (!restaurantData || restaurantData.length === 0) {
@@ -157,10 +159,8 @@
                 markers.push(marker);
 
                 let contentString = `<div>
-                                <h3>${restaurant.name}</h3>
-                                <p>${restaurant.address}</p>
-                                <p>${restaurant.number}</p>
-                                <p>Rating: ${restaurant.rating}</p>
+                                <h3>${restaurant.place_id}</h3>
+
                               </div>`
 
 
@@ -168,12 +168,25 @@
                     infoWindow.close();
                     infoWindow.setContent(contentString);
                     infoWindow.open(map, marker);
-                    showCustomInfoCard(restaurant, markers);
+                    showCustomInfoCard(restaurant);
+                });
+            });
+
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const restaurantId = card.getAttribute('data-id');
+                    const restaurant = restaurantData.find(r => r.place_id === restaurantId);
+                    console.log(restaurant);
+                    if (restaurant) {
+                        map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
+                        highlightMarker(restaurantId, markers);
+                        highlightInfoCard(restaurantId);
+                    }
                 });
             });
 
             function showCustomInfoCard(restaurant) {
-                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
+                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.place_id}"]`);
 
                 if (infoCard) {
                     // Scroll to info card if it's not in view
@@ -192,16 +205,6 @@
                 }
             }
 
-            document.querySelectorAll('.info-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const restaurantId = card.getAttribute('data-id');
-                    const restaurant = restaurantData.find(r => r.id === restaurantId);
-                    if (restaurant) {
-                        map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
-                        highlightMarker(restaurantId, markers);
-                    }
-                });
-            });
 
             function highlightInfoCard(restaurantId) {
                 document.querySelectorAll('.info-card').forEach(card => {
@@ -215,7 +218,7 @@
 
             function highlightMarker(restaurantId) {
                 markers.forEach(marker => {
-                    if (marker.getTitle() === restaurantData.find(r => r.id === restaurantId).name) {
+                    if (marker.title === restaurantData.find(r => r.place_id === restaurantId).name) {
                         marker.setAnimation(google.maps.Animation.BOUNCE);
                         setTimeout(() => marker.setAnimation(null), 1400);
                     }
@@ -233,7 +236,6 @@
 
             fitMapToBounds(markers);
         }
-
 
         async function getUserPos() {
             const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");

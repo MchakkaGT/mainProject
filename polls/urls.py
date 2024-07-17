@@ -8,7 +8,7 @@ urlpatterns = [
     path('restaurants_search/', views.restaurant_search, name='restaurant_search'),
     path('geolocation/', views.geolocation, name='geolocation'),
     path('favorites/', views.favorites, name='favorites'),
-    path('test/', views.test, name='test'),
+    path('details/', views.details, name='details'),
 
     # Get user location
     path('get_location/', views.restaurant_search, name='get_location'),
