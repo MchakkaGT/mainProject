@@ -11,7 +11,7 @@ urlpatterns = [
     path('details/', views.details, name='details'),
 
     # Get user location
-    path('get_location/', views.restaurant_search, name='get_location'),
+    path('get_location/', views.get_location, name='get_location'),
 
     #REST API Links
     path('add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),

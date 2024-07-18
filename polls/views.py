@@ -7,37 +7,46 @@ from django.http import JsonResponse
 from polls.models import Favorite
 
 
-lat = None
-lng = None
+latitude = None
+longitude = None
+
 # View function to call on the home page
 def home(request):
     return render(request, 'polls/home.html')
 
-def details(request):
-    return render(request, 'polls/details.html')
 
+# Gets user location
 def get_location(request):
-    print("Got here")
+
     if request.method == 'POST':
-        print("Got here")
-        # data = json.loads(request.body)
-        # coord = data.get('coords', [])
-        # print(coord)
-        # lat = coord.get('lat')
-        # lng = coord.get('lng')
+        global latitude, longitude
+
+        try:
+            data = json.loads(request.body)
+            latitude = data['lat']
+            longitude = data['lng']
+
+            return JsonResponse({"message": "Successfully Sent"})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
 
 # View function that is used to call on the restaurant_search page
 def restaurant_search(request):
     # When submit button is clicked, the if statement gets the values in each field.
     if request.method == 'POST':
+        global latitude, longitude
         if request.POST.get('query'):
             query = request.POST.get('query', '')
             rating = request.POST.get('rating')
             max_price = request.POST.get('max_price')
             distance = request.POST.get('distance')
 
-            print(lat)
-            print(lng)
+            print(latitude)
+            print(longitude)
+
+            location = f"{latitude}, {longitude}"
 
 
             # Convert distance to meters if specified
@@ -45,7 +54,7 @@ def restaurant_search(request):
                 distance = int(distance) * 1000
 
             # Gets data from the API and saves them in a variable.
-            details = get_restaurant_details(query, rating, max_price, distance)
+            details = get_restaurant_details(query, rating, max_price, distance, location)
             details_json = json.dumps(details)
 
             return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
@@ -60,7 +69,7 @@ def restaurant_search(request):
 
 
 # Function to retrieve restaurants sorted by distance
-def get_restaurant_details(query, rating=None, max_price=None, distance=None, coords=None):
+def get_restaurant_details(query, rating=None, max_price=None, distance=None, location='33.77683196783757, -84.39622529694923'):
     api_key = 'AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0'
     base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
@@ -69,10 +78,9 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None, co
         'keyword': query,
         'key': api_key,
         'type': 'restaurant',
-        'location': '33.77683196783757, -84.39622529694923', # set to coords when data is formatted correctly
+        'location': location, # set to coords when data is formatted correctly
         'radius': distance or 5000
     }
-
 
     response = requests.get(base_url, params=params)
     result = response.json()
