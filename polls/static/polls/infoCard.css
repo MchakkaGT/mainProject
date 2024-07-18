@@ -85,7 +85,7 @@ body {
 }
 
 .fav-button {
-    background-color: #4CAF50;
+    background-color: #C73659; /*#4CAF50*/
     color: white;
     padding: 10px 20px;
     border: none;
@@ -97,11 +97,11 @@ body {
 }
 
 .fav-button:hover {
-    background-color: #45a049;
+    background-color: #A91D3A; /*#45a049*/
 }
 
 .detailedPg {
-    background-color: #4CAF50; /* Green background */
+    background-color: #C73659; /*#4CAF50 Green background */
     color: white; /* White text */
     padding: 12px 20px; /* Padding */
     border: none; /* No border */
@@ -112,7 +112,7 @@ body {
 }
 
 .detailedPg:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #A91D3A;/*#45a049 Darker green on hover */
 }
 
 .modal {
