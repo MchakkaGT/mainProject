@@ -98,124 +98,153 @@
 
 
 <script>
-        let map, infoWindow;
-        let pos = { lat: 33.77683196783757, lng: -84.39622529694923 };
+    let map, infoWindow;
+    let pos = { lat: 33.77683196783757, lng: -84.39622529694923 };
+    const markers = []; // Move markers array to the top level
 
-        async function initMap() {
-            const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    async function initMap() {
+        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: pos, // Default center coordinates (can be any starting point)
-                zoom: 15,
-                mapId: "123891748939",
-            });
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: pos,
+            zoom: 15,
+            mapId: "123891748939",
+        });
 
-            pos = getUserPos();
+        pos = getUserPos();
 
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "Pan to Current Location";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+        locationButton.addEventListener("click", () => {
+            getUserPos();
+        });
+        infoWindow = new google.maps.InfoWindow();
 
-            const locationButton = document.createElement("button");
-            locationButton.textContent = "Pan to Current Location";
-            locationButton.classList.add("custom-map-control-button");
-            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
-            locationButton.addEventListener("click", () => {
-                getUserPos();
-            });
-            infoWindow = new google.maps.InfoWindow();
+        await nearbySearch();
+        await searchResults();
+    }
 
-            await nearbySearch();
-            await searchResults();
-
+    async function searchResults() {
+        const restaurantData = {{ mapDetails|default:"null"|safe }};
+        if (!restaurantData || restaurantData.length === 0) {
+            console.log("no data");
+            return;
         }
 
-        async function searchResults() {
-            const restaurantData = {{ mapDetails|default:"null"|safe }};
-            if (!restaurantData || restaurantData.length === 0) {
-                console.log("no data");
-                return;
-            }
-            const markers = [];
-            // Add markers for restaurants
-            restaurantData.forEach(restaurant => {
-                const marker = new google.maps.Marker({
-                    position: {lat: restaurant.lat, lng: restaurant.lng},
-                    map: map,
-                    title: restaurant.name
-                });
+        // Add markers for restaurants
+        restaurantData.forEach(restaurant => {
+            const marker = new google.maps.Marker({
+                position: { lat: restaurant.lat, lng: restaurant.lng },
+                map: map,
+                title: restaurant.name,
+                place_id: restaurant.place_id
+            });
 
+            if (restaurant.place_id) {
                 markers.push(marker);
+            }
+            console.log(restaurant.place_id);
 
+            let contentString = `<div>
+                <h3>${restaurant.name}</h3>
+                <p>${restaurant.address}</p>
+                <p>${restaurant.number}</p>
+                <p>Rating: ${restaurant.rating}</p>
+                </div>`;
 
-                let contentString = `<div>
-                                <h3>${restaurant.name}</h3>
-                                <p>${restaurant.address}</p>
-                                <p>${restaurant.number}</p>
-                                <p>Rating: ${restaurant.rating}</p>
-                              </div>`
-
-
-                marker.addListener('click', () => {
-                    infoWindow.close();
-                    infoWindow.setContent(contentString);
-                    infoWindow.open(map, marker);
-                    showCustomInfoCard(restaurant);
-                });
+            marker.addListener('click', () => {
+                infoWindow.close();
+                infoWindow.setContent(contentString);
+                infoWindow.open(map, marker);
+                showCustomInfoCard(restaurant.place_id); // Pass place_id directly
             });
+        });
 
-            function showCustomInfoCard(restaurant) {
-                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
-
-                if (infoCard) {
-                    // Scroll to info card if it's not in view
-                    const cardRect = infoCard.getBoundingClientRect();
-                    const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
-
-                    if (!isCardVisible) {
-                        infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                    
+        // Inside the showCustomInfoCard function
+        function showCustomInfoCard(place_id) {
+            const infoCard = document.querySelector(`.info-card[data-id="${place_id}"]`);
+        
+            if (infoCard) {
+                // Scroll to info card if it's not in view
+                const cardRect = infoCard.getBoundingClientRect();
+                const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+        
+                if (!isCardVisible) {
+                    infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
+        
+                highlightMarker(place_id); // Highlight the marker when the info card is shown
             }
-
-            document.querySelectorAll('.info-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const restaurantId = card.getAttribute('data-id');
-                    const restaurant = restaurantData.find(r => r.id === restaurantId);
-                    if (restaurant) {
-                        map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
-                    }
-                });
-            });
-            
-            // Function to fit map to contain all markers
-            function fitMapToBounds() {
-                const bounds = new google.maps.LatLngBounds();
-                markers.forEach(marker => {
-                    bounds.extend(marker.getPosition());
-                });
-                map.fitBounds(bounds);
-            }
-
-            fitMapToBounds();
         }
 
+        // Inside the event listener for the info-card click
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const rest_id = card.getAttribute('data-id');
+                console.log(restaurantData);
+                console.log(markers);
+                markers.forEach(marker => {
+                    let restaurant = null;
+                    console.log(marker.place_id + "   " + rest_id);
+                    if (marker.place_id === rest_id) {
+                        restaurant = marker;
+                    }
+                    {#const restaurant = restaurantData.find(r => r.place_id === marker.place_id);#}
+                    if (restaurant) {
+                        map.panTo({ lat: marker.lat, lng: marker.lng });
+                        //marker.setAnimation(google.maps.Animation.BOUNCE);
+                        highlightMarker(marker.place_id);
+                    }
+                });
+            });
+        });
 
-        function getUserPos() {
-            let userPos;
-            if (infoWindow) {
-                infoWindow.close();
+        // Function to fit map to contain all markers
+        function fitMapToBounds() {
+            const bounds = new google.maps.LatLngBounds();
+            markers.forEach(marker => {
+                bounds.extend(marker.getPosition());
+            });
+            map.fitBounds(bounds);
+        }
+        logAllMarkerPlaceIds();
+        fitMapToBounds();
+    }
+
+    function highlightMarker(restaurantId) {
+        markers.forEach(marker => {
+            if (marker.place_id === restaurantId) {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(() => marker.setAnimation(null), 1400);
             }
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        userPos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        };
+        });
+    }
 
-                        map.setCenter(userPos);
+    function logAllMarkerPlaceIds() {
+        markers.forEach(marker => {
+            console.log("Logging marker placeId:", marker.place_id); // Fix: Use place_id
+        });
+    }
 
-                        const userMarker = new google.maps.Marker({
+    function getUserPos() {
+        let userPos;
+        if (infoWindow) {
+            infoWindow.close();
+        }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userPos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+
+                    map.setCenter(userPos);
+
+                    const userMarker = new google.maps.Marker({
                         position: userPos,
                         map: map,
                         title: "Your Location",
@@ -224,82 +253,73 @@
                         }
                     });
 
-                    markers.push(userMarker);
-
-
-                    },
-                    () => {
-                        handleLocationError(true, infoWindow, map.getCenter());
-                    },
-                );
-            } else {
-                handleLocationError(false, infoWindow, map.getCenter());
-            }
-            return userPos;
+                    //markers.push(userMarker);
+                },
+                () => {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                },
+            );
+        } else {
+            handleLocationError(false, infoWindow, map.getCenter());
         }
+        return userPos;
+    }
 
-        async function nearbySearch() {
-          //@ts-ignore
-          const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
-            "places",
-          );
-          const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-          // Restrict within the map viewport.
-          let center = map.center;
-          const request = {
-            // required parameters
-            fields: ["displayName", "location", "businessStatus", ],
+    async function nearbySearch() {
+        //@ts-ignore
+        const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+        let center = map.center;
+        const request = {
+            fields: ["displayName", "location", "businessStatus"],
             locationRestriction: {
-              center: center,
-              radius: 1000,
+                center: center,
+                radius: 1000,
             },
-            // optional parameters
             includedPrimaryTypes: ["restaurant"],
             maxResultCount: 5,
             rankPreference: SearchNearbyRankPreference.POPULARITY,
             language: "en-US",
             region: "us",
-          };
-          //@ts-ignore
-          const { places } = await Place.searchNearby(request);
+        };
+        //@ts-ignore
+        const { places } = await Place.searchNearby(request);
 
-          if (places.length) {
+        if (places.length) {
             console.log(places);
 
             const { LatLngBounds } = await google.maps.importLibrary("core");
             const bounds = new LatLngBounds();
 
-            // Loop through and get all the results.
             places.forEach((place) => {
                 const pin = new PinElement({
                     background: '#FBBC04',
                     scale: 1,
                 });
 
-              const marker = new AdvancedMarkerElement({
-                map,
-                position: place.location,
-                title: place.displayName,
+                const marker = new AdvancedMarkerElement({
+                    map,
+                    position: place.location,
+                    title: place.displayName,
+                    content: pin.element,
+                    gmpClickable: true,
+                });
 
-                  content: pin.element,
-                  gmpClickable: true,
-              });
+                marker.addListener("click", ({ domEvent, latLng }) => {
+                    const { target } = domEvent;
+                    infoWindow.close();
+                    infoWindow.setContent(marker.title);
+                    infoWindow.open(marker.map, marker);
+                });
 
-            marker.addListener("click", ({ domEvent, latLng }) => {
-                const { target } = domEvent;
-                infoWindow.close();
-                infoWindow.setContent(marker.title);
-                infoWindow.open(marker.map, marker);
-            });
-
-              bounds.extend(place.location);
-              console.log(place);
+                bounds.extend(place.location);
+                console.log(place);
             });
             map.fitBounds(bounds);
-          } else {
+        } else {
             console.log("No results");
-          }
         }
+    }
 
     function handleLocationError(browserHasGeolocation, infoWindow, pos) {
         infoWindow.setPosition(pos);
@@ -311,8 +331,9 @@
         infoWindow.open(map);
     }
 
-        initMap();
-    </script>
+    initMap();
+</script>
+
 
 
 
