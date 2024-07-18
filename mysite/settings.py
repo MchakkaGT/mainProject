@@ -128,10 +128,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.mail.me.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = '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'
+EMAIL_HOST_USER = 'rtelliott05@icloud.com'
+EMAIL_HOST_PASSWORD = 'iozh-efwh-wvsu-eyeh'
+DEFAULT_FROM_EMAIL = 'rtelliott05@icloud.com'
