@@ -10,9 +10,14 @@ from polls.models import Favorite
 latitude = None
 longitude = None
 
+
 # View function to call on the home page
 def home(request):
     return render(request, 'polls/home.html')
+
+
+def details(request, place_id):
+    return render(request, 'polls/details.html', {'place_id': place_id})
 
 
 # Gets user location

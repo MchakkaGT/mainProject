@@ -5,7 +5,6 @@ from django.contrib.auth import logout
 from django.shortcuts import render
 
 
-
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("login")

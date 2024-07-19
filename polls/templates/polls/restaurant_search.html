@@ -82,7 +82,6 @@
     <div class="main-content">
         <div class="restaurant-list">
             {% if details %}
-
                 {% for detail in details %}
                     <div class="info-card" data-id="{{ detail.place_id }}">
                         {% include 'polls/components/infoCard.html' with detail=detail %}

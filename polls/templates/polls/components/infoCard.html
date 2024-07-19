@@ -6,6 +6,7 @@
     <title>InfoCard</title>
     <link rel="stylesheet" href="{% static 'polls/infoCard.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
 
 </head>
 <body>
@@ -44,25 +45,22 @@
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
 
-        <button class="detailedPg" onclick="expandCard(this)">
+        <button class="detailedPg" onclick="expandCard(this)" data-place_id="{{ detail.place_id }}">
             More Details
         </button>
+    
     </div>
 
     <!-- Modal Structure -->
     <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeWindow(this)">X</span>
-            {% include 'polls/details.html' with place_id=detail.place_id %}
+        <div id="modal-content" class="modal-content">
+
         </div>
     </div>
-
-
     
 
-{#      Functionality to add and remove from favorites#}
+    {#  Functionality to add and remove from favorites#}
     <script>
-
         // The JS function is provided by Django to get the CSRF token (Security Token).
         function getCookie(name) {
             let cookieValue = null;
@@ -194,20 +192,31 @@
         // Detailed view
         function expandCard(button) {
             const modal = document.getElementById("detailModal");
-            
-            modal.style.display = "block";
+            const placeId = button.getAttribute('data-place_id');
+            const poo = document.getElementById("modal-content");
+        
+            $.ajax({
+                url: `/polls/details/${placeId}/`,
+                type: 'GET',
+                success: function(data) {
+                    poo.innerHTML += `<span class="close" onclick="closeWindow()">X</span>`;
+                    poo.innerHTML += data;
+                    modal.style.display = "block";
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching details:', error);
+                }
+            });
         }
 
         function closeWindow() {
             const modal = document.getElementById("detailModal");
+            const poo = document.getElementById("modal-content");
+            
+            poo.innerHTML = "";
 
             modal.style.display = "none";
         }
-        
-
-
-
-
 
     </script>
 
