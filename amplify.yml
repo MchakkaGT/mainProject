@@ -15,3 +15,15 @@ backend:
   cache:
     paths:
       - '**/venv/**'
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "No frontend build commands required"
+  artifacts:
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - '**/node_modules/**'
