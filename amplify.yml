@@ -8,9 +8,8 @@ backend:
       commands:
         - python manage.py collectstatic --noinput
         - python manage.py migrate
-        - python manage.py runserver
   artifacts:
-    baseDirectory: /
+    baseDirectory: staticfiles
     files:
       - '**/*'
   cache:
