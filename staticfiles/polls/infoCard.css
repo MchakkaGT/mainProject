@@ -1,0 +1,101 @@
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.cards__item {
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    width: 400px;
+}
+
+.restaurant-img {
+    height: 200px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: auto auto;
+}
+
+.restaurant-img.no-image {
+    background-color: #ccc;
+}
+
+.info {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.restaurant-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.restaurant-address,
+.timings,
+.description {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.description {
+    font-style: italic;
+}
+
+
+.rating {
+    background-color: #f8f8f8;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.stars {
+    display: inline-block;
+    unicode-bidi: bidi-override;
+    color: #f8ce0b;
+    font-size: 20px;
+    position: relative;
+    bottom: 5px;
+}
+
+.star {
+    display: inline-block;
+    position: relative;
+    width: 1.2em;
+}
+
+.star:before {
+    content: '\2605';
+}
+
+.restaurant-rating {
+    display: inline-block;
+    padding-left: 10px;
+    font-size: 20px;
+    padding-bottom: 4px;
+}
+
+.fav-button {
+    background-color: #ff6347;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.fav-button:hover {
+    background-color: #e5533d;
+}
