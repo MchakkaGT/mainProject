@@ -195,12 +195,14 @@
                     if (!isCardVisible) {
                         infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
-
+                    
                     // Highlight the info card
                     document.querySelectorAll('.info-card').forEach(card => {
+                    card.classList.remove('highlight');
                         card.classList.remove('highlight');
                     });
                     infoCard.classList.add('highlight');
+                    
                 }
             }
 
@@ -218,8 +220,8 @@
             function highlightMarker(restaurantId) {
                 markers.forEach(marker => {
                     if (marker.title === restaurantData.find(r => r.place_id === restaurantId).name) {
-                        marker.setAnimation(google.maps.Animation.BOUNCE);
-                        setTimeout(() => marker.setAnimation(null), 1400);
+                        {#marker.setAnimation(google.maps.Animation.BOUNCE);#}
+                        {#setTimeout(() => marker.setAnimation(null), 1400);#}
                     }
                 });
             }
@@ -308,7 +310,6 @@
 
             const { LatLngBounds } = await google.maps.importLibrary("core");
             const bounds = new LatLngBounds();
-            {#await sendPlaces(places)#}
     
             // Loop through and get all the results.
             places.forEach((place) => {

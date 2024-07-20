@@ -109,6 +109,7 @@ body {
 }
 
 .info-card.highlight {
+    padding: 13px;
     border: 2px solid #f00;
     background-color: #ffebeb;
 }

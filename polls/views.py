@@ -48,9 +48,6 @@ def restaurant_search(request):
             max_price = request.POST.get('max_price')
             distance = request.POST.get('distance')
 
-            print(latitude)
-            print(longitude)
-
             location = f"{latitude}, {longitude}"
 
 
@@ -270,8 +267,8 @@ def remove_from_favorites(request):
 
 # Is a RestAPI call to Django Database to fetch the place_ids of all the restaurants the user has saved.
 def get_favorite_place_ids(request):
-    if Favorite.objects.filter(user=request.user) is None:
-        return "Empty"
+    if not request.user.is_authenticated:
+        return JsonResponse([], safe=False)
     else:
         favorite_place_ids = list(Favorite.objects.filter(user=request.user).values_list('place_id', flat=True))
         return JsonResponse(favorite_place_ids, safe=False)

@@ -1,4 +1,3 @@
-
 body {
     margin: 0;
     padding: 0;
@@ -10,19 +9,41 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    height: 350px;
+    height: 430px;
     width: 400px;
+    position: relative;
 }
 
 .restaurant-img {
-    height: 200px;
+    height: 150px;
+    border-radius: 5px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: auto auto;
+    position: relative;
 }
 
 .restaurant-img.no-image {
     background-color: #ccc;
+}
+
+.fav-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.3s;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.fav-button:hover {
+    background-color: #45a049;
 }
 
 .info {
@@ -47,7 +68,6 @@ body {
 .description {
     font-style: italic;
 }
-
 
 .rating {
     background-color: #f8f8f8;
@@ -84,35 +104,19 @@ body {
     padding-bottom: 4px;
 }
 
-.fav-button {
+.detailedPg {
     background-color: #4CAF50;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.fav-button:hover {
-    background-color: #45a049;
-}
-
-.detailedPg {
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
-    padding: 12px 20px; /* Padding */
-    border: none; /* No border */
-    border-radius: 4px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 16px; /* Font size */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    transition: background-color 0.3s ease;
 }
 
 .detailedPg:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049;
 }
 
 .modal {
@@ -131,10 +135,10 @@ body {
 
 .modal-content {
     background-color: white;
-    margin: 5% auto; /* 5% from the top and centered */
+    margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 85%; /* Could be more or less, depending on screen size */
+    width: 85%;
     position: relative;
 }
 
@@ -150,11 +154,3 @@ body {
     text-decoration: none;
     cursor: pointer;
 }
-
-.modal img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin-top: 10px;
-}
-

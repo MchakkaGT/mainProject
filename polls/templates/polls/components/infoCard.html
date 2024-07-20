@@ -7,25 +7,25 @@
     <link rel="stylesheet" href="{% static 'polls/infoCard.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 
     <div class="cards__item">
-        <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');"></div>
-
-        {% if user.is_authenticated %}
-            <button class="fav-button" onclick="buttonClicked(this)"
-                data-place_id="{{ detail.place_id }}"
-                data-name="{{ detail.name }}"
-                data-address="{{ detail.address }}"
-                data-open_hours="{{ detail.open_hours }}"
-                data-number="{{ detail.number }}"
-                data-rating="{{ detail.rating }}"
-                data-image_url="{{ detail.image_url }}">
-            Add to Favorites
-        </button>
-        {% endif %}
+        <div class="restaurant-img {% if not detail.image_url %}no-image{% endif %}" style="background-image: url('{{ detail.image_url }}');">
+            {% if user.is_authenticated %}
+                <button class="fav-button" onclick="buttonClicked(this)"
+                    data-place_id="{{ detail.place_id }}"
+                    data-name="{{ detail.name }}"
+                    data-address="{{ detail.address }}"
+                    data-open_hours="{{ detail.open_hours }}"
+                    data-number="{{ detail.number }}"
+                    data-rating="{{ detail.rating }}"
+                    data-image_url="{{ detail.image_url }}">
+                    <i class="fa-regular fa-heart"></i> Favorites
+                </button>
+            {% endif %}
+        </div>
     
         <div class="info">
             <p class="restaurant-name">{{ detail.name}}</p>
@@ -57,7 +57,6 @@
 
         </div>
     </div>
-    
 
     {#  Functionality to add and remove from favorites#}
     <script>
@@ -78,7 +77,7 @@
         }
 
         let favoritePlaceIds = [];
-
+        
         // Fetch favorite place IDs when the page loads
         $(document).ready(function() {
             // Fetches the data then updates the buttons while loading.
@@ -97,7 +96,7 @@
                 success: function(response) {
                         favoritePlaceIds = response;
                 },
-                error: function(xhr, status, error) {
+                error: function(xhr,status, error) {
                     console.error('Error fetching favorite place IDs:', error);
                 }
             });
@@ -112,9 +111,9 @@
                 // if they match they are supposed to display remove or display add.
                 const placeId = button.getAttribute('data-place_id');
                 if (favoritePlaceIds.includes(placeId)) {
-                    button.textContent = 'Remove from Favorites';
+                    button.innerHTML = `<i class="fas fa-heart"></i> Favorites`;
                 } else {
-                    button.textContent = 'Add to Favorites';
+                    button.innerHTML = `<i class="fa-regular fa-heart"></i> Favorites`;
                 }
             });
         }
@@ -128,7 +127,7 @@
             if (isFavorite) {
                 // When the promise is resolved, the lines inside the .then with run.
                 removeFromFavorites(placeId, csrftoken).then(() => {
-                    button.textContent = 'Add to Favorites';
+                    button.innerHTML = `<i class="fa-regular fa-heart"></i> Favorites`;
                     favoritePlaceIds = favoritePlaceIds.filter(id => id !== placeId);
                 });
             } else {
@@ -144,7 +143,7 @@
 
                 // When the promise is resolved, the lines inside the .then with run.
                 addToFavorites(detail, csrftoken).then(() => {
-                    button.textContent = 'Remove from Favorites';
+                    button.innerHTML = `<i class="fas fa-heart"></i> Favorites`;
                     favoritePlaceIds.push(placeId);
                 });
             }
