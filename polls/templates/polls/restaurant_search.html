@@ -141,31 +141,32 @@
 
         async function searchResults() {
 
-            const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+            const {Marker} = await google.maps.importLibrary("marker");
             const restaurantData = {{ mapDetails|default:"null"|safe }};
             if (!restaurantData || restaurantData.length === 0) {
                 return;
             }
             // Add markers for restaurants
             restaurantData.forEach(restaurant => {
-                const marker = new AdvancedMarkerElement({
+                const marker = new Marker({
                     map,
                     position: {lat: restaurant.lat, lng: restaurant.lng},
-                    title: restaurant.name
+                    title: restaurant.name,
+                    content: restaurant.place_id
                 });
 
                 markers.push(marker);
 
-                let contentString = `<div>
-                                <h3>${restaurant.place_id}</h3>
-
-                              </div>`
+                {#let contentString = `<div>#}
+                {#                <h3>${restaurant.place_id}</h3>#}
+                {##}
+                {#              </div>`#}
 
 
                 marker.addListener('click', () => {
-                    infoWindow.close();
-                    infoWindow.setContent(contentString);
-                    infoWindow.open(map, marker);
+                    {#infoWindow.close();#}
+                    {#infoWindow.setContent(contentString);#}
+                    {#infoWindow.open(map, marker);#}
                     showCustomInfoCard(restaurant);
                 });
             });
@@ -177,7 +178,7 @@
                     console.log(restaurant);
                     if (restaurant) {
                         map.panTo({ lat: restaurant.lat, lng: restaurant.lng });
-                        highlightMarker(restaurantId, markers);
+                        highlightMarker(restaurantId);
                         highlightInfoCard(restaurantId);
                     }
                 });
@@ -194,14 +195,14 @@
                     if (!isCardVisible) {
                         infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
-                    
+
                     // Highlight the info card
                     document.querySelectorAll('.info-card').forEach(card => {
                     card.classList.remove('highlight');
                         card.classList.remove('highlight');
                     });
                     infoCard.classList.add('highlight');
-                    
+
                 }
             }
 
@@ -218,9 +219,9 @@
 
             function highlightMarker(restaurantId) {
                 markers.forEach(marker => {
-                    if (marker.title === restaurantData.find(r => r.place_id === restaurantId).name) {
-                        {#marker.setAnimation(google.maps.Animation.BOUNCE);#}
-                        {#setTimeout(() => marker.setAnimation(null), 1400);#}
+                    if (marker.content === restaurantId) {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => marker.setAnimation(null), 1400);
                     }
                 });
             }
@@ -323,6 +324,8 @@
     
               bounds.extend(place.location);
             });
+
+
             map.fitBounds(bounds);
           } else {
             console.log("No results");
