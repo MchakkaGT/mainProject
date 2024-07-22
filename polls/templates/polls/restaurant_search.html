@@ -84,18 +84,16 @@
             {% if details %}
                 {% for detail in details %}
                     <div class="info-card" data-id="{{ detail.place_id }}">
-                        {% include 'polls/components/infoCard.html' with detail=detail %}
+                        {% include 'polls/components/infoCardSearched.html' with detail=detail %}
                     </div>
                 {% endfor %}
 
-{#            {% elif places %}#}
-{##}
-{#                <p>Got here</p>#}
-{#                {% for place in places %}#}
-{#                    <div class="info-card" data-id="{{ place.id }}">#}
-{#                        {% include 'polls/components/infoCard.html' with detail=place %}#}
-{#                    </div>#}
-{#                {% endfor %}#}
+            {% elif places %}
+                {% for place in places %}
+                    <div class="info-card" data-id="{{ place.id }}">
+                        {% include 'polls/components/infoCardPlaces.html' with detail=place %}
+                    </div>
+                {% endfor %}
 
             {% else %}
                 <p>Search for restaurants by typing their name, cuisine type, or street name.</p>
@@ -117,12 +115,12 @@
             const { Map, InfoWindow } = await google.maps.importLibrary("maps");
 
             map = new Map(document.getElementById("map"), {
-                center: pos, // Default center coordinates (can be any starting point)
+                center: getUserPos(), // Default center coordinates (can be any starting point)
                 zoom: 15,
                 mapId: "123891748939",
             });
 
-            pos = getUserPos();
+            {#pos = getUserPos();#}
 
 
             const locationButton = document.createElement("button");
@@ -133,11 +131,12 @@
                 getUserPos();
             });
             infoWindow = new InfoWindow();
-
-            await nearbySearch();
-            await searchResults();
-
-
+            
+            if ({{ placesJSON|default:"null"|safe }}) {
+                await nearbySearch();
+            } else {
+                await searchResults();
+            }
         }
 
         async function searchResults() {
@@ -265,10 +264,7 @@
                         });
 
                         sendUser(userPos);
-
-
-
-
+                        
                     },
                     () => {
                         handleLocationError(true, infoWindow, map.getCenter());
@@ -282,28 +278,10 @@
         
         async function nearbySearch() {
           //@ts-ignore
-          const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
-            "places",
-          );
           const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
           // Restrict within the map viewport.
-          let center = map.center;
-          const request = {
-            // required parameters
-            fields: ["displayName", "location", "businessStatus", "id", "adrFormatAddress", "rating", "reviews"],
-            locationRestriction: {
-              center: center,
-              radius: 1000,
-            },
-            // optional parameters
-            includedPrimaryTypes: ["restaurant"],
-            maxResultCount: 6,
-            rankPreference: SearchNearbyRankPreference.POPULARITY,
-            language: "en-US",
-            region: "us",
-          };
           //@ts-ignore
-          const { places } = await Place.searchNearby(request);
+          const places = {{ placesJSON|default:"null"|safe }};
                 
           if (places.length) {
               console.log(places);
@@ -377,7 +355,7 @@
             return cookieValue;
         }
 
-    function sendUser(position) {
+        function sendUser(position) {
         const csrftoken = getCookie('csrftoken');
 
         const posCoords = {

@@ -9,6 +9,7 @@ from polls.models import Favorite
 
 latitude = None
 longitude = None
+places = []
 
 
 # View function to call on the home page
@@ -16,8 +17,23 @@ def home(request):
     return render(request, 'polls/home.html')
 
 
+# Used to send place_id to html page to display restaurants detailed info.
 def details(request, place_id):
     return render(request, 'polls/details.html', {'place_id': place_id})
+
+
+def receive_places(request):
+    if request.method == 'POST':
+        global places
+
+        try:
+            data = json.loads(request.body)
+            places = data
+
+            return JsonResponse({"message": "Successfully Sent"})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+    return JsonResponse({'error': "Invalid request method"}, status=405)
 
 
 # Gets user location
@@ -50,7 +66,6 @@ def restaurant_search(request):
 
             location = f"{latitude}, {longitude}"
 
-
             # Convert distance to meters if specified
             if distance:
                 distance = int(distance) * 1000
@@ -61,13 +76,10 @@ def restaurant_search(request):
 
             return render(request, 'polls/restaurant_search.html', {'mapDetails': details_json, 'details': details})
 
-        elif request.body:
-            data = json.loads(request.body)
-            places = data.get('places', [])
-            # print(places)
-            return render(request, 'polls/restaurant_search.html', {'places': places})
+    global places
 
-    return render(request, 'polls/restaurant_search.html', {})
+    places_json = json.dumps(places)
+    return render(request, 'polls/restaurant_search.html', {'places': places, 'placesJSON': places_json})
 
 
 # Function to retrieve restaurants sorted by distance

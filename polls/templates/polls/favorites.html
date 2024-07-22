@@ -28,7 +28,7 @@
                 {% if favorites %}
                 {% for favorite in favorites %}
                     <div class="info-card">
-                        {% include 'polls/components/infoCard.html' with detail=favorite%}
+                        {% include 'polls/components/infoCardSearched.html' with detail=favorite%}
                     </div>
                 {% endfor %}
             {% else %}
