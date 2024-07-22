@@ -168,6 +168,8 @@
                     {#infoWindow.setContent(contentString);#}
                     {#infoWindow.open(map, marker);#}
                     showCustomInfoCard(restaurant);
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                    setTimeout(() => marker.setAnimation(null), 1400);
                 });
             });
 
@@ -279,7 +281,7 @@
         
         async function nearbySearch() {
           //@ts-ignore
-          const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+          const { Marker } = await google.maps.importLibrary("marker");
           // Restrict within the map viewport.
           //@ts-ignore
           const places = {{ placesJSON|default:"null"|safe }};
@@ -301,32 +303,97 @@
 
 
 
-                const pin = new PinElement({
-                    background: '#FBBC04',
-                    scale: 1,
-                });
+                {#const pin = new PinElement({#}
+                {#    background: '#FBBC04',#}
+                {#    scale: 1,#}
+
     
-              const marker = new AdvancedMarkerElement({
+              const marker = new Marker({
                 map,
                 position: place.location,
                 title: place.displayName,
-    
-                  content: pin.element,
-                  gmpClickable: true,
+                  content: place.id,
               });
+
+              markers.push(marker);
     
-            marker.addListener("click", ({ domEvent, latLng }) => {
-                const { target } = domEvent;
-                infoWindow.close();
-                infoWindow.setContent(marker.title);
-                infoWindow.open(marker.map, marker);
-            });
-    
-              bounds.extend(place.location);
+            marker.addListener('click', () => {
+                    {#infoWindow.close();#}
+                    {#infoWindow.setContent(contentString);#}
+                    {#infoWindow.open(map, marker);#}
+                    showCustomInfoCard(place);
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                    setTimeout(() => marker.setAnimation(null), 1400);
+                });
             });
 
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const restaurantId = card.getAttribute('data-id');
+                    const restaurant = places.find(r => r.id === restaurantId);
+                    console.log(restaurant);
+                    if (restaurant) {
+                        map.panTo({ lat: restaurant.location.lat, lng: restaurant.location.lng });
+                        highlightMarker(restaurantId);
+                        highlightInfoCard(restaurantId);
+                    }
+                });
+            });
 
-            map.fitBounds(bounds);
+            function showCustomInfoCard(restaurant) {
+                const infoCard = document.querySelector(`.info-card[data-id="${restaurant.id}"]`);
+
+                if (infoCard) {
+                    // Scroll to info card if it's not in view
+                    const cardRect = infoCard.getBoundingClientRect();
+                    const isCardVisible = cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+
+                    if (!isCardVisible) {
+                        infoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+
+                    // Highlight the info card
+                    document.querySelectorAll('.info-card').forEach(card => {
+                    card.classList.remove('highlight');
+                        card.classList.remove('highlight');
+                    });
+                    infoCard.classList.add('highlight');
+
+                }
+            }
+
+
+            function highlightInfoCard(restaurantId) {
+                document.querySelectorAll('.info-card').forEach(card => {
+                    if (card.getAttribute('data-id') === restaurantId) {
+                        card.classList.add('highlight');
+                    } else {
+                        card.classList.remove('highlight');
+                    }
+                });
+            }
+
+            function highlightMarker(restaurantId) {
+                markers.forEach(marker => {
+                    if (marker.content === restaurantId) {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => marker.setAnimation(null), 1400);
+                    }
+                });
+            }
+
+            // Function to fit map to contain all markers
+            function fitMapToBounds() {
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach(marker => {
+                    bounds.extend(marker.position);
+                });
+                map.fitBounds(bounds);
+            }
+
+            fitMapToBounds(markers);
+
+
           } else {
             console.log("No results");
           }
@@ -375,7 +442,6 @@
             contentType: 'application/json',
             success: function(response) {
                 console.log("Successfully sent the location.");
-                console.log(posCoords);
             },
             error: function(xhr, status, error) {
                 console.error('Error sending the location:', error);
