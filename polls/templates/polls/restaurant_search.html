@@ -133,8 +133,10 @@
             infoWindow = new InfoWindow();
             
             if ({{ placesJSON|default:"null"|safe }}) {
-                await nearbySearch();
+                console.log("here w nearby");
+                nearbySearch();
             } else {
+                console.log("here without");
                 await searchResults();
             }
         }
