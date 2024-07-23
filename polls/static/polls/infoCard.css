@@ -28,7 +28,7 @@ body {
 }
 
 .fav-button {
-    background-color: #4CAF50;
+    background-color: #C73659;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -43,7 +43,7 @@ body {
 }
 
 .fav-button:hover {
-    background-color: #45a049;
+    background-color: #A91D3A;
 }
 
 .info {
@@ -105,7 +105,7 @@ body {
 }
 
 .detailedPg {
-    background-color: #4CAF50;
+    background-color: #C73659;
     color: white;
     padding: 12px 15px;
     border: none;
@@ -116,7 +116,7 @@ body {
 }
 
 .detailedPg:hover {
-    background-color: #45a049;
+    background-color: #A91D3A;
 }
 
 .modal {

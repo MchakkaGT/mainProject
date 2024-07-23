@@ -43,6 +43,10 @@ body {
     font-size: 17px;
 }
 
+.search-bar-container button:hover {
+    background-color: #A91D3A;
+}
+
 .main-content {
     display: flex;
     height: 100vh;
