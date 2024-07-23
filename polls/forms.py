@@ -5,14 +5,14 @@ from django.contrib.auth.forms import User
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(label="Email")
-    first_name = forms.CharField(label="First name")
-    last_name = forms.CharField(label="Last name")
+    first_name = forms.CharField(label="First Name")
+    last_name = forms.CharField(label="Last Name")
 
     class Meta:
         model = User
         fields = ("first_name", "last_name", "username",)
 
-    def save(self, commit=True):
+    def save(self, commit=True, first_name=first_name, last_name=last_name):
         user = super(CustomUserCreationForm, self).save(commit=False)
         user.first_name = first_name
         user.last_name = last_name
