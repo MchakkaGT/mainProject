@@ -69,7 +69,9 @@
 
         async function start() {
             await getUserPos();
+            console.log(loc);
             await nearbySearch();
+            console.log(placesToSend);
         }
 
 
@@ -84,72 +86,73 @@
                         };
                     }
                 )
+
             }
         }
 
-        async function nearbySearch() {
-            const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
+            async function nearbySearch() {
+                const {Place, SearchNearbyRankPreference} = await google.maps.importLibrary("places");
 
-            const request = {
-                fields: ["displayName", "location", "id", "formattedAddress", "rating", "nationalPhoneNumber", "photos", "regularOpeningHours"],
-                locationRestriction: {
-                  center: loc,
-                  radius: 1000,
-                },
-                // optional parameters
-                includedPrimaryTypes: ["restaurant"],
-                maxResultCount: 6,
-                rankPreference: SearchNearbyRankPreference.POPULARITY,
-                language: "en-US",
-                region: "us",
-            }
-
-            let { places } = await Place.searchNearby(request);
-            placesToSend = places.map(place => place.Eg);
-
-            const currDay = (new Date()).getDay();
-            placesToSend.forEach(place => {
-                if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
-                    const adjustedIndex = currDay === 0 ? 6 : currDay - 1;
-                    place.currentDayDescription = place.regularOpeningHours.weekdayDescriptions[adjustedIndex];
+                const request = {
+                    fields: ["displayName", "location", "id", "formattedAddress", "rating", "nationalPhoneNumber", "photos", "regularOpeningHours"],
+                    locationRestriction: {
+                        center: loc,
+                        radius: 1000,
+                    },
+                    // optional parameters
+                    includedPrimaryTypes: ["restaurant"],
+                    maxResultCount: 6,
+                    rankPreference: SearchNearbyRankPreference.POPULARITY,
+                    language: "en-US",
+                    region: "us",
                 }
-            });
-        }
 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
+                let {places} = await Place.searchNearby(request);
+                placesToSend = places.map(place => place.Eg);
+
+                const currDay = (new Date()).getDay();
+                placesToSend.forEach(place => {
+                    if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
+                        const adjustedIndex = currDay === 0 ? 6 : currDay - 1;
+                        place.currentDayDescription = place.regularOpeningHours.weekdayDescriptions[adjustedIndex];
+                    }
+                });
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
                     }
                 }
+                return cookieValue;
             }
-            return cookieValue;
-        }
 
-        function sendPlaces() {
-            const csrftoken = getCookie('csrftoken');
+            function sendPlaces() {
+                const csrftoken = getCookie('csrftoken');
 
-            return $.ajax({
-                url: '/polls/receive_places/',
-                type: 'POST',
-                headers: {'X-CSRFToken': csrftoken},
-                data: JSON.stringify(placesToSend),
-                contentType: 'application/json',
+                return $.ajax({
+                    url: '/polls/receive_places/',
+                    type: 'POST',
+                    headers: {'X-CSRFToken': csrftoken},
+                    data: JSON.stringify(placesToSend),
+                    contentType: 'application/json',
 
-                success: function (response) {
-                    console.log("Successfully sent the location.");
-                    console.log(response);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error sending the location:', error);
-                }
-            })
-        }
+                    success: function (response) {
+                        console.log("Successfully sent the location.");
+                        {#console.log(response);#}
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error sending the location:', error);
+                    }
+                })
+            }
     </script>
 </body>
 </html>

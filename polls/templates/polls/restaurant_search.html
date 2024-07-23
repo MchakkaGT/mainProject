@@ -133,8 +133,8 @@
             infoWindow = new InfoWindow();
             
             if ({{ placesJSON|default:"null"|safe }}) {
-                console.log("here w nearby");
-                nearbySearch();
+                {#console.log("here w nearby");#}
+                await nearbySearch();
             } else {
                 console.log("here without");
                 await searchResults();
@@ -244,7 +244,7 @@
 
         async function getUserPos() {
             const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
-            let userPos = { lat: 33.77683196783757, lng: -84.39622529694923 };
+            let userPos = { lat: 34.77683196783757, lng: -87.39622529694923 };
             if (infoWindow) {
                 infoWindow.close();
             }
@@ -289,7 +289,6 @@
           const places = {{ placesJSON|default:"null"|safe }};
                 
           if (places.length) {
-              console.log(places);
 
             const { LatLngBounds } = await google.maps.importLibrary("core");
             const bounds = new LatLngBounds();
@@ -434,8 +433,6 @@
             lat: position.lat,
             lng: position.lng
         };
-
-        console.log(posCoords);
         return $.ajax({
             url: '/polls/get_location/',
             type: 'POST',
@@ -443,7 +440,7 @@
             data: JSON.stringify(posCoords),
             contentType: 'application/json',
             success: function(response) {
-                console.log("Successfully sent the location.");
+                {#console.log("Successfully sent the location.");#}
             },
             error: function(xhr, status, error) {
                 console.error('Error sending the location:', error);
