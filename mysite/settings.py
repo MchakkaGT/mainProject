@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-y1%i3pgwhoad@rasd0$xfuh+w9^e8r%d746+4)&adco)j%1*8!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['markerplay.d3qufel7m4uztl.amplifyapp.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = [
+    'mainproject-1-v9la.onrender.com',
+    '127.0.0.1',
+    'localhost'
+]
 
 
 
