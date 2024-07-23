@@ -1,1 +1,1 @@
-web: gunicorn mainProject.wsgi
+web: gunicorn mysite.wsgi

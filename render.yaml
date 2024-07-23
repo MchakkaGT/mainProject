@@ -1,6 +1,13 @@
 services:
   - type: web
-    name: mainProject
+    name: my-django-app
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn mainProject.wsgi:application
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn mysite.wsgi:application"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        value: "your-very-secure-secret-key"
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "your-app-name.onrender.com,127.0.0.1,localhost"
