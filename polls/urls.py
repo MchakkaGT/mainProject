@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 
@@ -13,4 +15,4 @@ urlpatterns = [
     path('add_to_favorites/', views.add_to_favorites, name='add_to_favorites'),
     path('remove_from_favorites/', views.remove_from_favorites, name='remove_from_favorites'),
     path('get_favorite_place_ids/', views.get_favorite_place_ids, name='get_favorite_place_ids')
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
