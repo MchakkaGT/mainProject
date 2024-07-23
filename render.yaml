@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: mainProject
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn mainProject.wsgi:application
