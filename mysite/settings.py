@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
    'mainproject-1-v9la.onrender.com',
+   'https://tasteofatlanta.onrender.com',
    '127.0.0.1',
    'localhost'
 ]
