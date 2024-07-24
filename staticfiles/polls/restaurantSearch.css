@@ -30,7 +30,7 @@ body {
 .search-bar-container button {
     width: 40px;
     height: 40px;
-    background-color: #4CAF50;
+    background-color: #C73659 /*#4CAF50*/;
     border: none;
     border-radius: 50%;
     position: absolute;
@@ -41,6 +41,10 @@ body {
     color: white;
     cursor: pointer;
     font-size: 17px;
+}
+
+.search-bar-container button:hover {
+    background-color: #A91D3A;
 }
 
 .main-content {
@@ -109,6 +113,7 @@ body {
 }
 
 .info-card.highlight {
+    padding: 13px;
     border: 2px solid #f00;
     background-color: #ffebeb;
 }
