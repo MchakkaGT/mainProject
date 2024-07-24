@@ -7,7 +7,15 @@
     <link rel="stylesheet" href="{% static 'polls/infoCard.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">#}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+            $(function(){
+                $('.stars').stars();
+            });
+        </script>
 </head>
 <body>
 
@@ -34,13 +42,11 @@
             <p class="phone_number"><strong>Phone Number: </strong> {{ detail.nationalPhoneNumber }}</p>
         </div>
 
+
+
         <div class="rating">
-            <div class="stars">
-                <span class="star"></span>
-                <span class="star"></span>
-                <span class="star"></span>
-                <span class="star"></span>
-            </div>
+            <span class="stars" data-rating="{{ detail.rating }}" data-num-stars="5" ></span>
+
 
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
@@ -60,6 +66,17 @@
 
     {#  Functionality to add and remove from favorites#}
     <script>
+
+        $.fn.stars = function() {
+    return $(this).each(function() {
+        const rating = $(this).data("rating");
+        const numStars = $(this).data("numStars");
+        const fullStar = '<i class="fas fa-star"></i>'.repeat(Math.floor(rating));
+        const halfStar = (rating%1!== 0) ? '<i class="fas fa-star-half-alt"></i>': '';
+        const noStar = '<i class="far fa-star"></i>'.repeat(Math.floor(numStars-rating));
+        $(this).html(`${fullStar}${halfStar}${noStar}`);
+    });
+}
         // The JS function is provided by Django to get the CSRF token (Security Token).
         function getCookie(name) {
             let cookieValue = null;
