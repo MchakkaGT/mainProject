@@ -14,7 +14,6 @@
       <p>What are you waiting for?</p>
       <div class="hero-btns">
         {% if user.is_authenticated %}
-                <p style="color: white">Welcome back, {{ user.username }}</p>
                 <a href="/accounts/login/" class="btn">ACCOUNT</a>
             {% else %}
                 <a href="/accounts/signup/" class="btn">SIGN UP</a>
