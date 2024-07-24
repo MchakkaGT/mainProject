@@ -3,10 +3,8 @@
 /*For both pages*/
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
 }
 
 
@@ -99,4 +97,21 @@
 
 .exit_link a:hover {
     color: #C73659;
+}
+
+/* Style the container for password error messages */
+.password-errors {
+    margin-top: 20px;
+}
+
+/* Style individual error messages */
+.error-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-bottom: 5px;
 }

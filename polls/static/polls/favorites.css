@@ -2,6 +2,7 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #EEEEEE;
 }
 
 .auth-container {
@@ -26,8 +27,23 @@ body {
     padding-left: 20px;
 }
 
+.auth-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.auth-message {
+    margin-bottom: 20px;
+}
+
 .fa-user-lock {
     display: flex;
+    margin: 0 auto 10px auto;
     justify-content: center;
     align-items: center;
     width: 80px;
@@ -35,37 +51,32 @@ body {
     background-color: #EEEEEE;
     border-radius: 50%;
     color: black;
-    margin-bottom: 10px;
     font-size: 1.75rem;
 }
-
 
 .accounts {
     display: flex;
     gap: 10px;
+    justify-content: center;
 }
 
-.accounts button {
-    margin: 0;
-    padding: 0;
-}
-
-.accounts a {
+.auth-button {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     text-decoration: none;
-    border: 2px solid #fff;
-    background-color: #fff;
+    border: 2px solid #151515;
+    background-color: #C73659;
     color: black;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s, border-width 0.3s;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-sizing: border-box;
 }
 
-.accounts a:hover {
-    background-color: black;
-    color: white;
-    border-width: 4px;
+.auth-button:hover {
+    background-color: #A91D3A;
+    color: black;
+    transform: scale(1.05);
 }

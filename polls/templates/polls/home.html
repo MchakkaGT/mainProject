@@ -1,8 +1,11 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
+    <link rel="stylesheet" href="{% static 'polls/home.css' %}">
     
 </head>
 <body>
@@ -13,6 +16,40 @@
     <div style="width: 100%">
         {% include 'polls/components/heroSection.html' %}
     </div>
+
+    <div class="about-hero">
+        <div class="overlay">
+            <h1>About Us</h1>
+            <p>Discover the best dining experiences nearby and save your favorite spots with ease.</p>
+        </div>
+
+        <div class="slideshow">
+            <div class="slide"><img src="{% static 'polls/images/restaurant_1.jpeg' %}" alt="Restaurant 1"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_3.jpeg' %}" alt="Restaurant 3"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_2.jpeg' %}" alt="Restaurant 2"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_4.jpeg' %}" alt="Restaurant 4"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_5.jpeg' %}" alt="Restaurant 5"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_7.jpeg' %}" alt="Restaurant 7"></div>
+            <div class="slide"><img src="{% static 'polls/images/restaurant_6.jpeg' %}" alt="Restaurant 6"></div>
+        </div>
+    </div>
+
+    <div class="newsPaper-container">
+        <div class="newsPaper">
+            <h1>Sign Up for Our Weekly Newspaper</h1>
+            <p>Stay updated with the latest news, tips, and exclusive offers delivered straight to your inbox every week.</p>
+            <form action="/polls/" method="POST" class="signup-form">
+                {% csrf_token %}
+                <label for="email"></label>
+                <div class="input-box">
+                    <input type="email" id="email" name="email" placeholder="Enter your email: example@example.com" required>
+                    <button type="submit">Subscribe</button>
+                </div>
+            </form>
+            <p class="privacy-note">We respect your privacy. Your email address will never be shared.</p>
+        </div>
+    </div>
+
 
 </body>
 </html>

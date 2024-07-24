@@ -92,7 +92,7 @@ def get_restaurant_details(query, rating=None, max_price=None, distance=None, lo
         'keyword': query,
         'key': api_key,
         'type': 'restaurant',
-        'location': location, # set to coords when data is formatted correctly
+        'location': location,
         'radius': distance or 5000
     }
 

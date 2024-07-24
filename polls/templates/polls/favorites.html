@@ -16,11 +16,14 @@
     
     <div>
         {% if not user.is_authenticated %}
-            <div class="auth-container">
+            <div class="auth-card">
                 <i class="fa-solid fa-user-lock"></i>
+                <div class="auth-message">
+                    <p>To be able to save your favorite restaurants or to access your favorite's list, please log in or sign up.</p>
+                </div>
                 <div class="accounts">
-                    <button><a href="/accounts/signup/" class="">SIGN UP</a></button>
-                    <button><a href="/accounts/login/" class="">LOGIN</a></button>
+                    <a href="/accounts/signup/" class="auth-button">SIGN UP</a>
+                    <a href="/accounts/login/" class="auth-button">LOGIN</a>
                 </div>
             </div>
         {% else %}

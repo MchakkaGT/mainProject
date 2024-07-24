@@ -14,27 +14,25 @@ body {
     position: sticky;
     top: 0;
     z-index: 999;
+    width: 100%;
 }
 
 .navbar-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 80px;
-    max-width: 1500px;
+    width: 100%;
+    padding: 0 20px;
 }
 
 .nav-menu {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-gap: 10px;
+    display: flex;
     list-style: none;
     text-align: center;
-    width: 50vw;
-    justify-content: end;
-
 }
 
+/* come back to this*/
 .button-account {
     display: grid;
     grid-template-columns: repeat(3, auto);
@@ -46,8 +44,7 @@ body {
 
 .navbar-logo {
     color: #fff;
-    justify-self: start;
-    margin-left: 20px;
+    margin-right: auto;
     cursor: pointer;
     text-decoration: none;
     font-size: 2rem;
@@ -55,8 +52,9 @@ body {
     align-items: center;
 }
 
+/* check later */
 .nav-item {
-    height: 50px;
+    margin: 0 15px;
 }
 
 .nav-links {
@@ -87,6 +85,20 @@ body {
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, border-width 0.3s;
     margin-top: 10px;
+}
+
+.btn-account {
+    margin-left: 0.75rem;
+    width: 8vw;
+}
+
+.btn-signup {
+    margin-left: 0.75rem;
+    width: 5vw;
+}
+
+.btn-login {
+    width: 6vw;
 }
 
 .btn:hover {
