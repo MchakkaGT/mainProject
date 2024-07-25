@@ -45,9 +45,27 @@
 
 
         <div class="rating">
-            <span class="stars" data-rating="{{ detail.rating }}" data-num-stars="5" ></span>
-
-
+             <div class="stars" data-rating="{{ detail.rating }}"></div>
+            <script>
+                $(".stars").each(function () {
+                    let rating = $(this).data("rating");
+                    console.log(rating);
+                    rating = Math.round(rating * 2) / 2;
+                    let stars = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (rating >= 1) {
+                            stars += '<i class="fa-solid fa-star" style="color: gold;"></i>';
+                            rating--;
+                        } else if (rating === 0.5) {
+                            stars += '<i class="fa-solid fa-star-half" style="color: gold;"></i>';
+                            rating = 0;
+                        } else {
+                            stars += '<i class="fa-solid fa-star-o" aria-hidden="true"></i>';
+                        }
+                    }
+                    $(this).html(stars);
+                });
+            </script>
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
 
