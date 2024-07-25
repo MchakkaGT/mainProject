@@ -35,30 +35,26 @@
         </div>
 
         <div class="rating">
-            <div id="stars"></div>
+            <div class="stars" data-rating="{{ detail.rating }}"></div>
             <script>
-                console.log({{ detail.rating }});
-                getStars({{ detail.rating }});
-            </script>
-            <script>
-                function getStars(rating) {
-                        // Round to nearest half
-                        rating = Math.round(rating * 2) / 2;
-                        let stars = '';
-                        for (let i = 0; i < 5; i++) {
-                            if (rating >= 1) {
-                                stars += '<i class="fa-solid fa-star" style="color: gold;"></i>';
-                                rating--;
-                            } else if (rating === 0.5) {
-                                stars += '<i class="fa-solid fa-star-half" style="color: gold;"></i>';
-                                rating = 0;
-                            } else {
-                                stars += '<i class="fa-solid fa-star-o" aria-hidden="true"></i>';
-                            }
+                $(".stars").each(function () {
+                    let rating = $(this).data("rating");
+                    console.log(rating);
+                    rating = Math.round(rating * 2) / 2;
+                    let stars = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (rating >= 1) {
+                            stars += '<i class="fa-solid fa-star" style="color: gold;"></i>';
+                            rating--;
+                        } else if (rating === 0.5) {
+                            stars += '<i class="fa-solid fa-star-half" style="color: gold;"></i>';
+                            rating = 0;
+                        } else {
+                            stars += '<i class="fa-solid fa-star-o" aria-hidden="true"></i>';
                         }
-                        document.getElementById("stars").innerHTML = stars;
                     }
-
+                    $(this).html(stars);
+                });
             </script>
 
             <div class="restaurant-rating">{{ detail.rating }}</div>
