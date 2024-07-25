@@ -1,0 +1,167 @@
+.about-hero {
+    position: relative;
+    background-color: black;
+    height: 50vh;
+    padding: 10vh;
+    color: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.about-hero .overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.overlay h1 {
+    font-size: 50px;
+}
+
+.overlay p {
+    font-size: 20px;
+}
+
+.slideshow {
+    display: flex;
+    padding-bottom: 50px;
+}
+
+.slide {
+    flex: 0 0 170px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.slide img {
+    width: 170px;
+    height: 170px;
+    border-radius: 10%;
+    object-fit: cover;
+}
+
+.newsPaper-container {
+    width: 100%;
+    background-color: #EEEEEE   ;
+}
+
+.newsPaper {
+    padding: 15vh;
+    text-align: center;
+    margin: 0 auto;
+    height: 30vh;
+}
+
+.newsPaper h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.newsPaper p {
+    font-size: 17px;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.signup-form label {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.privacy-note {
+    font-size: 12px;
+    color: #999;
+    margin-top: 10px;
+}
+
+.input-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.input-box input {
+    width: 50vw;
+    border-radius: 20px;
+    border: 2px solid gray;
+    font-size: 16px;
+    padding: 15px 50px 15px 15px;
+}
+
+.input-box button {
+    width: 90px;
+    height: 50px;
+    background-color: black;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+    right: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.input-box button:hover {
+    background-color: #121212;
+}
+
+.footer {
+    background-color: black;
+    color: white;
+    padding: 20px 0; /* Vertical padding */
+    font-size: 14px;
+}
+
+.footer-content {
+    display: flex; /* Flexbox to arrange sections side by side */
+    justify-content: space-around; /* Space out sections */
+    max-width: 1200px; /* Max width of the footer content */
+    margin: 0 auto; /* Center align the footer content */
+    padding: 0 20px; /* Horizontal padding */
+}
+
+.footer-section {
+    flex: 1; /* Make each section take up equal space */
+    margin: 0 10px; /* Margin between sections */
+}
+
+.footer-section h2 {
+    border-bottom: 2px solid #007BFF; /* Underline with a color */
+    padding-bottom: 10px; /* Padding below the heading */
+    margin-bottom: 10px; /* Margin below the heading */
+}
+
+.footer-section p {
+    margin: 5px 0; /* Margin for paragraphs */
+}
+
+.footer-section a {
+    color: #fff; /* Link color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.footer-section a:hover {
+    text-decoration: underline; /* Underline links on hover */
+}
+
+.footer-bottom {
+    text-align: center; /* Center align text in the footer bottom */
+    padding: 10px 0; /* Vertical padding */
+    border-top: 1px solid #444; /* Top border for separation */
+    margin-top: 20px; /* Margin above the footer bottom */
+}

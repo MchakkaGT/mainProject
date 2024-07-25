@@ -1,0 +1,119 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.search-container {
+    background: url("images/restSearch.jpeg") no-repeat center;
+    background-size: cover;
+    height: 35vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.search-bar {
+    width: 50vw;
+    border-radius: 20px;
+    border: 2px solid gray;
+    font-size: 16px;
+    padding: 15px 50px 15px 15px;
+}
+
+.search-bar-container button {
+    width: 40px;
+    height: 40px;
+    background-color: #C73659 /*#4CAF50*/;
+    border: none;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.search-bar-container button:hover {
+    background-color: #A91D3A;
+}
+
+.main-content {
+    display: flex;
+    height: 100vh;
+}
+
+.restaurant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Adjust spacing between info cards */
+    max-height: 100vh;
+    overflow-y: auto; /* Enable scrolling if there are more cards than fit on the screen */
+}
+
+.map-container {
+    width: 70%;
+    height: 100vh;
+    padding-left: 10px;
+}
+
+.info-card {
+    margin-bottom: 20px;
+    padding-top: 30px;
+    padding-left: 20px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    padding-right: 19px;
+}
+
+.filter {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.filter label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filter select,
+.filter input {
+    width: 99%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px gray;
+}
+
+.info-card.highlight {
+    padding: 13px;
+    border: 2px solid #f00;
+    background-color: #ffebeb;
+}
