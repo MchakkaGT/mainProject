@@ -9,5 +9,5 @@ app_name = "map"
 
 urlpatterns = [
    path('', views.map_view, name='map_view'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 
