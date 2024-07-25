@@ -24,4 +24,7 @@ urlpatterns = [
     path('get_favorite_place_ids/', views.get_favorite_place_ids, name='get_favorite_place_ids')
 
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
