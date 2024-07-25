@@ -64,6 +64,7 @@ body {
     width: 70%;
     height: 100vh;
     padding-left: 10px;
+    flex-grow: 1;
 }
 
 .info-card {

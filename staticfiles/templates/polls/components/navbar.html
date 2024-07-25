@@ -42,7 +42,7 @@
                     <a href="/polls" class="nav-links">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/polls/restaurants_search" class="nav-links" onclick="sendPlaces()" style="width: 10vw">Restaurant Search</a>
+                    <a href="/polls/restaurants_search" class="nav-links" onclick="sendPlaces()" style="width: 140px;">Restaurant Search</a>
                 </li>
                 <li>
                     <a href="/polls/favorites" class="nav-links">Favorites</a>
@@ -70,6 +70,7 @@
         async function start() {
             await getUserPos();
             await nearbySearch();
+            await sendPlaces();
         }
 
 
@@ -92,7 +93,7 @@
                 const {Place, SearchNearbyRankPreference} = await google.maps.importLibrary("places");
 
                 const request = {
-                    fields: ["displayName", "location", "id", "formattedAddress", "rating", "nationalPhoneNumber", "photos", "regularOpeningHours"],
+                    fields: ["displayName", "location", "id", "formattedAddress", "rating", "photos", "nationalPhoneNumber", "regularOpeningHours"],
                     locationRestriction: {
                         center: loc,
                         radius: 1000,

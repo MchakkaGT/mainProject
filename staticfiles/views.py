@@ -68,7 +68,7 @@ def restaurant_search(request):
 
             # Convert distance to meters if specified
             if distance:
-                distance = int(distance) * 1000
+                distance = int(distance) * 1609.344
 
             # Gets data from the API and saves them in a variable.
             details = get_restaurant_details(query, rating, max_price, distance, location)

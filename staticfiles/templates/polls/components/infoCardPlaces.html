@@ -21,7 +21,7 @@
                     data-open_hours="{{ detail.currentDayDescription }}"
                     data-number="{{ detail.nationalPhoneNumber }}"
                     data-rating="{{ detail.rating }}"
-                    data-image_url="https:{{ detail.photos.1.authorAttributions.0.photoURI|slice:"2:" }}">
+                    data-image_url="https:{{ detail.photos.1.authorAttributions.0.photoURI }}">
                     <i class="fa-regular fa-heart"></i> Favorites
                 </button>
             {% endif %}
@@ -35,12 +35,27 @@
         </div>
 
         <div class="rating">
-            <div class="stars">
-                <span class="star"></span>
-                <span class="star"></span>
-                <span class="star"></span>
-                <span class="star"></span>
-            </div>
+            <div class="stars" data-rating="{{ detail.rating }}"></div>
+            <script>
+                $(".stars").each(function () {
+                    let rating = $(this).data("rating");
+                    console.log(rating);
+                    rating = Math.round(rating * 2) / 2;
+                    let stars = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (rating >= 1) {
+                            stars += '<i class="fa-solid fa-star" style="color: gold;"></i>';
+                            rating--;
+                        } else if (rating === 0.5) {
+                            stars += '<i class="fa-solid fa-star-half" style="color: gold;"></i>';
+                            rating = 0;
+                        } else {
+                            stars += '<i class="fa-solid fa-star-o" aria-hidden="true"></i>';
+                        }
+                    }
+                    $(this).html(stars);
+                });
+            </script>
 
             <div class="restaurant-rating">{{ detail.rating }}</div>
         </div>
