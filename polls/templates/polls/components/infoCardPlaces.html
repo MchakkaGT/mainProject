@@ -21,14 +21,13 @@
                     data-open_hours="{{ detail.currentDayDescription }}"
                     data-number="{{ detail.nationalPhoneNumber }}"
                     data-rating="{{ detail.rating }}"
-                    data-image_url="https:{{ detail.photos.1.authorAttributions.0.photoURI|slice:"2:" }}">
+                    data-image_url="https:{{ detail.photos.1.authorAttributions.0.photoURI }}">
                     <i class="fa-regular fa-heart"></i> Favorites
                 </button>
             {% endif %}
         </div>
 
         <div class="info">
-            <p>'https:{{ detail.photos.1.authorAttributions.0.photoURI }}'</p>
             <p class="restaurant-name">{{ detail.displayName}}</p>
             <p class="restaurant-address">{{ detail.formattedAddress }}</p>
             <p class="timings"><strong>Closing Times:</strong> {{ detail.currentDayDescription }}</p>
