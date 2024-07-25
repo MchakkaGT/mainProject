@@ -19,6 +19,13 @@
     text-align: center;
 }
 
+.imgbox {
+    background: url("images/backimg2.jpg") no-repeat center;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
+}
+
 
 .title {
     margin-bottom: 20px;

@@ -80,3 +80,12 @@ body {
     color: black;
     transform: scale(1.05);
 }
+
+.fav-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.center-fav {
+
+}
