@@ -1,0 +1,36 @@
+{% extends "registration/base.html" %}
+{% load static %}
+<style>
+</style>
+
+<body style="height: 100vh">
+    {% block title %}Login{% endblock %}
+    {% block content %}
+
+    {% if user.is_authenticated %}
+    <div class="account-container">
+        <div>
+            <h1>Hi {{ user.username }}!</h1>
+            <div class="account-spacer">
+
+            </div>
+            <p><a href="{% url 'logout' %}" class="account_button">Log Out</a></p>
+            <p><a href="{% url 'password_reset' %}" class="account_button">Reset Password</a></p>
+        </div>
+    </div>
+
+    {% else %}
+        <div class="container">
+            <h2 class="title">Log In</h2>
+            <form class="inputs" method="post">
+                {% csrf_token %}
+                {{ form }}
+            <button class="click_button" type="submit">Log In</button>
+            <p class="exit_link"><a href="{% url 'signup' %}">Sign Up</a>
+                |
+                <a href="{% url 'password_reset' %}">Reset Password</a></p>
+            </form>
+        </div>
+    {% endif %}
+    {% endblock %}
+</body>

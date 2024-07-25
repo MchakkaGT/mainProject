@@ -1,0 +1,24 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'registration/authentication.css' %}">
+</head>
+
+<body style="background-color: #EEEEEE;">
+  <main>
+  
+    <div style="width: 100%;">
+        {% include 'polls/components/navbar.html' %}
+    </div>
+  
+    <div style="width: 100%;">
+        {% block content %}
+        {% endblock %}
+    </div>
+  </main>
+</body>
+
+</html>

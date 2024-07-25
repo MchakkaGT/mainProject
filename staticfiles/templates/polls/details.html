@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
+    
+    <gmpx-api-loader key="AIzaSyABdQf3ttPoUcYqIFNhRzgL3V-zOBNbUx0" solution-channel="GMP_GCC_placeoverview_v1_xl"></gmpx-api-loader>
+    <div class="container">
+      <gmpx-place-overview place={{ place_id }}>
+        <gmpx-place-directions-button slot="action">
+          Directions
+        </gmpx-place-directions-button>
+      </gmpx-place-overview>
+    </div>
+    
+    <style>
+    .container {
+      width: 150vh;
+    }
+    </style>
+</body>
+</html>

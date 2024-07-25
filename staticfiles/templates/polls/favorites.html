@@ -1,0 +1,45 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Favorites Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'polls/favorites.css' %}">
+</head>
+<body>
+    <div style="width: 100%;">
+        {% include 'polls/components/navbar.html' %}
+    </div>
+    
+    <div>
+        {% if not user.is_authenticated %}
+            <div class="auth-card">
+                <i class="fa-solid fa-user-lock"></i>
+                <div class="auth-message">
+                    <p>To be able to save your favorite restaurants or to access your favorite's list, please log in or sign up.</p>
+                </div>
+                <div class="accounts">
+                    <a href="/accounts/signup/" class="auth-button">SIGN UP</a>
+                    <a href="/accounts/login/" class="auth-button">LOGIN</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="card-grid">
+                {% if favorites %}
+                {% for favorite in favorites %}
+                    <div class="info-card">
+                        {% include 'polls/components/infoCardSearched.html' with detail=favorite%}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No favorites added yet.</p>
+            {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
