@@ -93,7 +93,7 @@
                 const {Place, SearchNearbyRankPreference} = await google.maps.importLibrary("places");
 
                 const request = {
-                    fields: ["displayName", "location", "id", "formattedAddress", "rating", "nationalPhoneNumber", "photos", "regularOpeningHours"],
+                    fields: ["displayName", "location", "id", "formattedAddress", "rating", "nationalPhoneNumber", "regularOpeningHours"],
                     locationRestriction: {
                         center: loc,
                         radius: 1000,
